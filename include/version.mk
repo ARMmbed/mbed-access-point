@@ -83,7 +83,7 @@ VERSION_SED:=$(SED) 's,%U,$(VERSION_REPO),g' \
 	-e 's,%d,\L$(subst $(space),_,$(VERSION_DIST)),g' \
 	-e 's,%R,$(REVISION),g' \
 	-e 's,%T,$(BOARD),g' \
-	-e 's,%S,$(BOARD)/$(if $(SUBTARGET),$(SUBTARGET),generic),g' \
+	-e 's,%S,$(BOARD)/generic,g' \
 	-e 's,%t,$(VERSION_TAINTS),g' \
 	-e 's,%M,$(VERSION_MANUFACTURER),g' \
 	-e 's,%m,$(VERSION_MANUFACTURER_URL),g' \

@@ -15,7 +15,8 @@ rpi-b |\
 rpi-b-plus |\
 rpi-2-b |\
 rpi-3-b)
-	ucidef_set_interface_lan "eth0"
+	ucidef_set_interface_wan "eth0" "dhcp"
+	ucidef_set_interface_lan "sl0"
 	;;
 esac
 

@@ -1,0 +1,26 @@
+--- a/drivers/net/slip/slip.c
++++ b/drivers/net/slip/slip.c
+@@ -366,7 +366,8 @@ static void sl_bump(struct slip *sl)
+ 	skb->dev = dev;
+ 	memcpy(skb_put(skb, count), sl->rbuff, count);
+ 	skb_reset_mac_header(skb);
+-	skb->protocol = htons(ETH_P_IP);
++	//skb->protocol = htons(ETH_P_IP);
++	skb->protocol = htons(ETH_P_IPV6);
+ 	netif_rx_ni(skb);
+ 	dev->stats.rx_packets++;
+ }
+--- a/drivers/tty/serial/amba-pl011.c
++++ b/drivers/tty/serial/amba-pl011.c
+@@ -1875,9 +1875,11 @@ pl011_set_termios(struct uart_port *port
+ 			old_cr |= UART011_CR_RTSEN;
+ 
+ 		old_cr |= UART011_CR_CTSEN;
++		port->status |= UPSTAT_AUTOCTS | UPSTAT_AUTORTS;
+ 		uap->autorts = true;
+ 	} else {
+ 		old_cr &= ~(UART011_CR_CTSEN | UART011_CR_RTSEN);
++		port->status &= ~(UPSTAT_AUTOCTS | UPSTAT_AUTORTS);
+ 		uap->autorts = false;
+ 	}
+ 

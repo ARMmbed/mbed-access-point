@@ -101,7 +101,7 @@
 ##     0        Disabled (Default)
 ##     1        Use composite mode even if HDMI monitor is detected
 ##
-#hdmi_ignore_hotplug=1 
+#hdmi_ignore_hotplug=1
 
 ## hdmi_drive
 ##     chooses between HDMI and DVI modes
@@ -536,7 +536,7 @@ enable_uart=1
 ##
 ##     Default 3000000 (3MHz)
 ##
-#init_uart_clock=3000000
+init_uart_clock=16000000
 
 ## init_emmc_clock
 ##     Initial emmc clock, increasing this can speedup your SD-card.
