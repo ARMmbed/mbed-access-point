@@ -14,7 +14,7 @@ package/feeds/.
 Use "make menuconfig" to configure your image.
 
 Simply running "make" will build your firmware.
-It will download all sources, build the cross-compile toolchain, 
+It will download all sources, build the cross-compile toolchain,
 the kernel and all choosen applications.
 
 You can use "scripts/flashing/flash.sh" for remotely updating your embedded
@@ -31,5 +31,3 @@ the lack of case sensitiveness in the file system.
 Sunshine!
 	Your OpenWrt Project
 	http://openwrt.org
-
-
