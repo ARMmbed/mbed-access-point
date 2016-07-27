@@ -22,8 +22,10 @@ else
     echo "Unable to generate GPIO 21 configuration files" > /dev/kmsg
 fi
 
+sleep 2
+
 # Print the IP address
-_IP=$(/sbin/ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1  -d'/')
+_IP=$(/sbin/ip addr | grep 'eth0' | tail -n1 | awk '{print $2}' | cut -f1  -d'/')
 echo "IP address is $_IP" > /dev/kmsg
 
 GPFSEL1=$(devmem 0x3F200004)
