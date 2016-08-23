@@ -1,1 +1,0 @@
-https://s3-eu-west-1.amazonaws.com/arm-mbed-access-point-rpi-image/openwrt-r49388-brcm2708-bcm2709-rpi-2-ext4-sdcard.img
