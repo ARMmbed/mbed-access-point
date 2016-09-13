@@ -66,11 +66,6 @@ generate_network() {
 
 	[ -n "$ifname" ] || return
 
-	# force bridge for multi-interface devices (and lan)
-	#case "$1:$ifname" in
-		#*\ * | lan:*) type="bridge" ;;
-	#esac
-
 	uci -q batch <<-EOF
 		delete network.$1
 		set network.$1='interface'
@@ -88,11 +83,10 @@ generate_network() {
 
 	case "$protocol" in
 		static)
-			local ip6addr=fe80::$(printf "%x" $RANDOM):$(printf "%x" $RANDOM):$(printf "%x" $RANDOM):$(printf "%x" $RANDOM)/64
 			local ipad
 			case "$1" in
-				lan) ipad=${ipaddr:-"192.168.1.1"} ;;
-				*) ipad=${ipaddr:-"192.168.$((addr_offset++)).1"} ;;
+				lan) ipad=${ipaddr:-"10.99.99.1"} ;;
+				*) ipad=${ipaddr:-"10.99.$((addr_offset++)).1"} ;;
 			esac
 
 			netm=${netmask:-"255.255.255.0"}
@@ -100,7 +94,6 @@ generate_network() {
 			uci -q batch <<-EOF
 				set network.$1.proto='static'
 				set network.$1.ipaddr='$ipad'
-				set network.$1.ip6addr='$ip6addr'
 				set network.$1.netmask='$netm'
 				set network.$1.ip6assign='64'
 			EOF
