@@ -170,17 +170,17 @@
  
  /**
   * \def POLARSSL_ENTROPY_C
-@@ -1662,8 +1662,8 @@
+@@ -1662,7 +1662,8 @@
   *
   * This module enables the AES-GCM and CAMELLIA-GCM ciphersuites, if other
   * requisites are enabled as well.
 - */
++*/
++
  #define POLARSSL_GCM_C
-+ */
  
  /**
-  * \def POLARSSL_HAVEGE_C
-@@ -1699,8 +1699,8 @@
+@@ -1699,8 +1700,8 @@
   * Requires: POLARSSL_MD_C
   *
   * Uncomment to enable the HMAC_DRBG random number geerator.
@@ -190,7 +190,7 @@
  
  /**
   * \def POLARSSL_MD_C
-@@ -1826,8 +1826,8 @@
+@@ -1826,8 +1827,8 @@
   * Requires: POLARSSL_HAVE_ASM
   *
   * This modules adds support for the VIA PadLock on x86.
@@ -200,7 +200,7 @@
  
  /**
   * \def POLARSSL_PBKDF2_C
-@@ -1992,8 +1992,8 @@
+@@ -1992,8 +1993,8 @@
   * Module:  library/ripemd160.c
   * Caller:  library/md.c
   *
@@ -210,7 +210,7 @@
  
  /**
   * \def POLARSSL_RSA_C
-@@ -2072,8 +2072,8 @@
+@@ -2072,8 +2073,8 @@
   * Caller:
   *
   * Requires: POLARSSL_SSL_CACHE_C
@@ -220,7 +220,7 @@
  
  /**
   * \def POLARSSL_SSL_CLI_C
-@@ -2149,8 +2149,8 @@
+@@ -2149,8 +2150,8 @@
   * Caller:  library/havege.c
   *
   * This module is used by the HAVEGE random number generator.
@@ -230,7 +230,7 @@
  
  /**
   * \def POLARSSL_VERSION_C
-@@ -2160,8 +2160,8 @@
+@@ -2160,8 +2161,8 @@
   * Module:  library/version.c
   *
   * This module provides run-time version information.
@@ -240,7 +240,7 @@
  
  /**
   * \def POLARSSL_X509_USE_C
-@@ -2270,8 +2270,8 @@
+@@ -2270,8 +2271,8 @@
   *
   * Module:  library/xtea.c
   * Caller:
