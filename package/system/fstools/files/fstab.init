@@ -3,12 +3,22 @@
 
 START=40
 
-start() {                            
+start() {
 	echo "this file has been obsoleted. please call \"/sbin/block mount\" directly"
+	touch /var/log/looking_fstab
+	[ -f /etc/config/fstab ] && {
+			touch /var/log/found_fstab
+			/bin/sed -i "s:/mnt/sda:/mnt/mbed:" "/etc/config/fstab"
+			lines=$(/usr/bin/wc -l /etc/config/fstab | /usr/bin/awk '{print $1}')
+			lines=$((lines - 1))
+			/bin/sed -i "$lines s:enabled[[:space:]]\'0\':enabled \'1\':" /etc/config/fstab
+			/bin/sed -i "$((lines + 1))i option  options 'sync'" /etc/config/fstab
+			/bin/sed -i "$((lines + 1)) s:^option:\t&:" /etc/config/fstab
+	}
 	/sbin/block mount
 }
 
-stop() {                            
+stop() {
 	echo "this file has been obsoleted. please call \"/sbin/block umount\" directly"
 	/sbin/block umount
 }
