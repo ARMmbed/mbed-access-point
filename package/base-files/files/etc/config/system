@@ -1,6 +1,6 @@
 config system
 	option hostname	OpenWrt
-	option timezone	UTC
+	option timezone	GMT0BST,M3.5.0/1,M10.5.0
 	option ttylogin	0
 
 config timeserver ntp
