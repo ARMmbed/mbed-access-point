@@ -30,7 +30,7 @@ You will need:
 1. [mbed 6LoWPAN Border Router HAT](https://developer.mbed.org/platforms/mbed-6LoWPAN-Border-Router-HAT/).
 1. Micro-USB cable.
 1. Mirco-SD card.
-1. Micro-SD to SD card adapter. 
+1. Micro-SD to SD card adapter.
 1. Ethernet cable.
 
 <span class="images">![](images/mbedap-raspberry-pi-mbed-border-router.jpg)</span>
@@ -49,7 +49,7 @@ We've all the hardware components needed. Let's start building our mbed Access P
 
 The pre-built image for Raspberry Pi 2B contains the necessary modules and packages to convert a Raspberry Pi into an OpenWrt-based Linux Router.
 
-The current version of mbed Access Point doesn't support tunneling, so it needs IPv6 support in the backbone network to set up end-to-end communication (Thread end nodes to [mbed Device Connector](https://connector.mbed.com/)). If your network only supports IPv4, you can use the default LAN network prefix included in the image: it creates an isolated Thread network based on the [ULA](https://tools.ietf.org/html/rfc4193) prefix `fd00:db80::/64`, so you can set up a Thread network without IPv6 support. The limitation in this configuration is that the Thread end nodes can only talk with mbed Access Point.
+The current version of mbed Access Point doesn't support tunneling, so it needs IPv6 support in the backbone network to set up end-to-end communication (Thread end nodes to [mbed Device Connector](https://connector.mbed.com/)). If your backbone network only supports IPv4, you can use the default LAN network prefix included in the image: it creates an isolated Thread network based on the [ULA](https://tools.ietf.org/html/rfc4193) prefix `fd00:db80::/64`, so you can set up a Thread network without IPv6 support. The limitation in this configuration is that the Thread end nodes can only talk with mbed Access Point.
 
 To use the pre-built image:
 
@@ -67,7 +67,7 @@ This repository contains the build system for an mbed Access Point based on the 
 1. Run `./scripts/feeds install -a` to install symlinks of all of them into `package/feeds/`.
 1. Run `make menuconfig` to change the configuration for your image.
 1. Run make to build the mbed Access Point image.
-    
+
     ```
     make
     ```
@@ -108,7 +108,7 @@ ___Installing___
 
 ## Communicating with the mbed Access Point through SSH or web GUI
 
-It is possible to communicate with mbed Access Point using either SSH or web GUI. For testing, we'll use SSH to enter and execute the commands. 
+It is possible to communicate with mbed Access Point using either SSH or web GUI. For testing, we'll use SSH to enter and execute the commands.
 
 **Tip:** You can also use the web GUI to configure and check the health of your mbed Access Point.
 
@@ -121,8 +121,8 @@ Method 1:
 1. Power on the Raspberry Pi.
 1. Wait until the red LED on the Raspberry Pi stops blinking.
 1. Power off the Raspberry Pi and remove the mirco-SD card.
-1. Insert the micro-SD card into the laptop using a *micro-SD to SD card* adapter. The SD card is be mounted automatically.
-1. The mbed Access Point IP address is in the file "ip_address.txt".
+1. Insert the micro-SD card into the laptop using a *micro-SD to SD card* adapter. The SD card will be mounted automatically.
+1. The IP address of the mbed Access Point is in the file "ip_address.txt".
 
 Method 2:
 
@@ -148,11 +148,11 @@ Use root user credentials to log in.
 
 ## Testing and verifying network connectivity
 
-If you have followed all the instructions correctly then you should have an mbed Access Point instance capable of managing a 6LoWPAN network. The next step is to perform basic tests that verify network connectivity between the Linux Router and the mbed 6LoWPAN Border Router.
+If you have followed all the instructions, then you should have an mbed Access Point instance capable of managing a Thread network. The next step is to perform basic tests that verify network connectivity between the Linux Router and the mbed 6LoWPAN Border Router.
 
 ### Backbone network with IPv4 support only
 
-As described before, if your backbone network only supports IPv4, then ULA addresses are used to set up a Thread network. In this case, the scope of Thread traffic is limited to mbed Access Point, as the ULA addresses are not routable over the Internet. However, the mbed Access Point can reach the mbed 6LoWPAN Border Router (or Thread Border Router) and end nodes.
+As described before, if your backbone network only supports IPv4, then ULA addresses are used to set up the Thread network. In this case, the scope of Thread traffic is limited to mbed Access Point, as the ULA addresses are not routable over the Internet. However, all  devices in the Thread network (mbed Access Point, the mbed 6LoWPAN Border Router and end nodes) can talk to each other.
 
 Let us try to ping the Thread Border Router from the Linux Router:
 
@@ -268,16 +268,14 @@ Let us try to ping the Thread Border Router from the Linux Router:
 
 1. The line `role[1]: fd00:db80::6407:8f79:ef5d:2052` indicates the IPv6 address of the backhaul interface.
 1. The line `[5]: fd00:db80::85c8:bc36:d6f9:d7a` indicates the IPv6 address of radio interface.
-1. Switch to a terminal with an SSH connection to the Linux Router. Try pinging the mbed 6LoWPAN Border Router using the ULA address:
+1. Switch to a terminal with the SSH connection to the Linux Router. Try pinging the mbed 6LoWPAN Border Router using the ULA address:
 ```
 ping6 fd00:db80::6407:8f79:ef5d:2052    // Pinging backhaul interface
 ping6 fd00:db80::85c8:bc36:d6f9:d7a     // Pinging radio interface
 ```
 
 ### Backbone network with IPv6 and DHCP-PD support
-If your backbone supports IPv6 and DHCP-PD, then the mbed Access Point will request the global prefix from the backbone router and configure the 6LoWPAN network according to the prefix received.
-
-[Dev - how does it request it?]
+The mbed Access Point includes odhcp6c module, which is a minimal DHCPv6 and RA-client. odhcp6c supports RA + stateful DHCPv6 (either IA_NA or IA_PD or both). If your backbone supports IPv6 and DHCP-PD, then the odhcp6c will request the global prefix from the backbone router and configure the Thread network according to the prefix received.
 
 ### Creating a Thread Network
 Congratulations!! You have just created an mbed Access Point for Thread. It's time to explore the world of Thread networks. Follow the instructions described in [mbed-os-example-client](https://github.com/ARMmbed/mbed-os-example-client) to set up Thread end nodes.
