@@ -1,1 +1,21 @@
+block detect > /etc/config/fstab
+
+if [ "$ACTION" = "add" ] ;
+  then if ! grep -q "enabled[[:space:]]'1'" /etc/config/fstab ; then
+    logger "block mount: add action received"
+    mkdir /mnt/mbed
+    /bin/sed -i "s:/mnt/sda:/mnt/mbed:" "/etc/config/fstab"
+    lines=$(/usr/bin/wc -l /etc/config/fstab | /usr/bin/awk '{print $1}')
+    lines=$((lines - 1))
+    /bin/sed -i "$lines s:enabled[[:space:]]\'0\':enabled \'1\':" /etc/config/fstab
+    /bin/sed -i "$((lines + 1))i option  options 'sync'" /etc/config/fstab
+    /bin/sed -i "$((lines + 1)) s:^option:\t&:" /etc/config/fstab
+  fi
+fi
+
+if [ "$ACTION" = "remove" ] ; then
+  logger "block mount: remove action received"
+  block detect > /etc/config/fstab
+fi
+
 /sbin/block hotplug
