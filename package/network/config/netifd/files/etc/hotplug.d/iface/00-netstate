@@ -3,5 +3,10 @@
 	[ -n "$DEVICE" ] && {
 		uci_toggle_state network "$INTERFACE" device "$(uci -q get network.$INTERFACE.ifname)"
 		uci_toggle_state network "$INTERFACE" ifname "$DEVICE"
+
+		if [ "$DEVICE" = "sl0" ] ; then
+			LAN_IP=fe80::$(printf "%x" $RANDOM):$(printf "%x" $RANDOM):$(printf "%x" $RANDOM):$(printf "%x" $RANDOM)/64
+			/sbin/ip addr add $LAN_IP dev sl0
+		fi
 	}
 }

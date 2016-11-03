@@ -6,6 +6,8 @@
 # put custom rules into the root chains e.g. INPUT or FORWARD or into the
 # special user chains, e.g. input_wan_rule or postrouting_lan_rule.
 
+set +e
+
 # Accept ssh traffic on wan port
 iptables --append input_wan_rule --protocol tcp --dport 22 --jump ACCEPT
 # Accept https traffic on wan port
@@ -14,3 +16,51 @@ iptables --append input_wan_rule --protocol tcp --dport 443 --jump ACCEPT
 iptables --append input_rule --protocol udp --dport 5353 --jump ACCEPT
 # Accept incoming snmp traffic
 iptables --append input_rule --protocol udp --dport 161 --jump ACCEPT
+
+#IPv6 rate-limiting
+logger -t firewall "Firewall.user called by  ???"
+destination_prefix=$(ip -6 route show | grep sl0 -m1 | grep static | awk '{print $1}')
+
+if [ ! -z $destination_prefix ]; then
+
+    ip6tables -F forwarding_rule
+    ip6tables -F thread_dos_new
+    ip6tables -F thread_dos_established
+
+    ip6tables -X thread_dos_new
+    ip6tables -X thread_dos_established
+
+    ip6tables -N thread_dos_new
+    ip6tables -N thread_dos_established
+    ipset create dos_ips hash:ip family inet6 -exist
+
+    ip6tables -A forwarding_rule -d $destination_prefix \
+    -m conntrack --ctstate NEW \
+    -j thread_dos_new
+
+    ip6tables -A thread_dos_new -m limit --limit 10/second --limit-burst 5 -j ACCEPT
+    ip6tables -A thread_dos_new -j LOG --log-prefix "Thread DOS: NEW" --log-level 6
+    ip6tables -A thread_dos_new -j DROP
+
+    ip6tables -A forwarding_rule -d $destination_prefix \
+    -m conntrack --ctstate RELATED,ESTABLISHED \
+    -j thread_dos_established
+
+    ip6tables -A thread_dos_established \
+    -m limit --limit 100/second --limit-burst 5 \
+    -j ACCEPT
+
+    ip6tables -A thread_dos_established \
+    -j LOG --log-prefix "Thread DOS: RELATED/ESTABLISHED " --log-level 6
+
+    ip6tables -A thread_dos_established \
+    -j SET --add-set dos_ips src --exist
+
+    ip6tables -A thread_dos_established \
+    -m set --match-set dos_ips src \
+    -j DROP
+else
+    logger -t firewall "IPv6 prefix is missing on SLIP interface"
+fi
+
+set -e

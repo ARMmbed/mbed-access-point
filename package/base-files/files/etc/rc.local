@@ -45,44 +45,6 @@ echo "Enabling Hardware flow control on UART0" > /dev/kmsg
 echo "Restarting lldpd" > /dev/kmsg
 /etc/init.d/lldpd restart
 
-#IPv6 rate-limiting
-destination_prefix=$(ip -6 route show | grep sl0 | grep static | awk '{print $1}')
-
-if [ ! -z $destination_prefix ]; then
-
-    ip6tables -N thread_dos_new
-    ip6tables -N thread_dos_established
-    ipset create dos_ips hash:ip family inet6 --exist
-
-    ip6tables -A forwarding_rule -d $destination_prefix \
-    -m conntrack --ctstate NEW \
-    -j thread_dos_new
-
-    ip6tables -A thread_dos_new -m limit --limit 10/second --limit-burst 5 -j ACCEPT
-    ip6tables -A thread_dos_new -j LOG --log-prefix "Thread DOS: NEW" --log-level 6
-    ip6tables -A thread_dos_new -j DROP
-
-    ip6tables -A forwarding_rule -d $destination_prefix \
-    -m conntrack --ctstate RELATED,ESTABLISHED \
-    -j thread_dos_established
-
-    ip6tables -A thread_dos_established \
-    -m limit --limit 100/second --limit-burst 5 \
-    -j ACCEPT
-
-    ip6tables -A thread_dos_established \
-    -j LOG --log-prefix "Thread DOS: RELATED/ESTABLISHED " --log-level 6
-
-    ip6tables -A thread_dos_established \
-    -j SET --add-set dos_ips src --exist
-
-    ip6tables -A thread_dos_established \
-    -m set --match-set dos_ips src \
-    -j DROP
-else
-    logger "Firewall: IPv6 prefix is missing on SLIP interface"
-fi
-
 set -e
 
 exit 0
