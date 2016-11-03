@@ -5,9 +5,6 @@
 
 set +e
 
-LAN_IP=fe80::$(printf "%x" $RANDOM):$(printf "%x" $RANDOM):$(printf "%x" $RANDOM):$(printf "%x" $RANDOM)/64
-/sbin/ip addr add $LAN_IP dev sl0
-
 i=0
 while [ $i -lt 20 ];  do
     _SLIP=$(/sbin/ip addr | grep 'sl0' -A5 | grep 'inet6' | grep 'scope global' | awk '{print $2}')
