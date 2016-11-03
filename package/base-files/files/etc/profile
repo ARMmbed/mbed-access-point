@@ -13,6 +13,7 @@ export PS1='\[\e[1;31m\]\u@\h:\w\$ \[\e[0m\]'
 
 [ -x /bin/more ] || alias more=less
 [ -x /usr/bin/vim ] && alias vi=vim || alias vim=vi
+alias ll="ls -l --color=auto"
 
 [ -z "$KSH_VERSION" -o \! -s /etc/mkshrc ] || . /etc/mkshrc
 
