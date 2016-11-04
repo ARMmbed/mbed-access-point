@@ -53,7 +53,7 @@ The current version of mbed Access Point doesn't support tunneling, so it needs 
 
 To use the pre-built image:
 
-1. Download the mbed Access Point [image](https://s3-eu-west-1.amazonaws.com/arm-mbed-access-point-rpi-image/openwrt-g8996865-brcm2708-bcm2709-rpi-2-ext4-sdcard.img).
+1. Download the mbed Access Point [image!](binaries/openwrt-mbedap-v2.0.0-brcm2708-bcm2709-rpi-2-ext4-sdcard.img).
 1. Install the image on a mirco-SD card. This [link](https://www.raspberrypi.org/documentation/installation/installing-images/) provides step by step instructions.
 1. Insert the mirco-SD card into the Raspberry Pi's mirco-SD card slot.
 
@@ -95,7 +95,8 @@ Use V=s for verbose build log:
 
 ___Getting the binary___
 
-The Thread Border Router binary with the default configuration (RF channel = 26) is available [here](https://s3-eu-west-1.amazonaws.com/mbed-thread-border-router/thread-testapp-private_gf755f92.bin).
+The Thread Border Router firmware is only avaialbe in binary form to mbed users. But, ARM mbed Partners can download the source from [here](https://github.com/ARMmbed/thread-testapp-private).
+The Thread Border Router binary with the default configuration (RF channel = 26 and PAN ID = 0xface) is available [here!](binaries/thread-testapp-private_gff74fb0.bin).
 
 ___Installing___
 
@@ -103,6 +104,7 @@ ___Installing___
 1. Ensure that the blue jumper (RESET-EN) is in the **off** position.
 1. Program your binary on the mbed 6LoWPAN Border Router using drag and drop. Wait until the red LED stops blinking to ensure that programming is complete.
 1. Attach the mbed 6LoWPAN Border Router to the Raspberry Pi, so that it fits firmly on top of the GPIO headers.
+1. Don't forget to move the blue jumper (RESET-EN) to **on** position.
 
 **Note**: mbed 6LoWPAN Border Router will be held in reset either until LAN interface on RPi is up and has a global IPv6 addresses, or for a maximum of 20 seconds.
 
