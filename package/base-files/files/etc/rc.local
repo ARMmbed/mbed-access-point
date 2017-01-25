@@ -1,18 +1,24 @@
 # Put your custom commands here that should be executed once
 # the system init finished. By default this file does nothing.
 
+if [ -x /sbin/ip ] ; then
+    IP_CMD=/sbin/ip
+elif [ -x /usr/bin/ip ] ; then
+    IP_CMD=/usr/bin/ip
+fi
+
 # Assign randomly generated link-local IP address to SLIP interface (LAN)
 
 set +e
 
-i=0
-while [ $i -lt 20 ];  do
-    _SLIP=$(/sbin/ip addr | grep 'sl0' -A5 | grep 'inet6' | grep 'scope global' | awk '{print $2}')
+timeout=20
+while [ $timeout -gt 0 ];  do
+    _SLIP=$($IP_CMD addr | grep 'sl0' -A5 | grep 'inet6' | grep 'scope global' | awk '{print $2}')
     if [ "$_SLIP" != "" ];  then
         echo "sl0: Global ip address - $_SLIP" > /dev/kmsg
         break
     fi
-    let i=i+1
+    timeout=$((timeout-1))
     sleep 1
 done
 
@@ -26,12 +32,18 @@ else
     echo "Unable to generate GPIO 21 configuration files" > /dev/kmsg
 fi
 
-sleep 2
-
+timeout=20
 # Print the IP address
-_IP=$(/sbin/ip addr | grep 'eth0' | tail -n1 | awk '{print $2}' | cut -f1  -d'/')
-echo "IP address is $_IP" > /boot/ip_address.txt
-echo "IP address is $_IP" > /dev/kmsg
+while [ $timeout -gt 0 ] ; do
+    _IP=$($IP_CMD addr | grep 'inet.*eth0$' | awk '{print $2}' | cut -f1  -d'/')
+    if [ "$_IP" != "" ] ; then
+        echo "IP address is $_IP" > /boot/ip_address.txt
+        echo "IP address is $_IP" > /dev/kmsg
+        break
+    fi
+    timeout=$((timeout-1))
+    sleep 1
+done
 
 GPFSEL1=$(devmem 0x3F200004)
 GPFSEL1=$(($GPFSEL1|0x00FC0000))
@@ -45,3 +57,4 @@ echo "Restarting lldpd" > /dev/kmsg
 set -e
 
 exit 0
+
