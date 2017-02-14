@@ -49,6 +49,12 @@ boot() {
 
 	/bin/board_detect
 	uci_apply_defaults
+
+		# Create /log/system.log if it doesn't exist
+	[ -d /log ] || {
+		mkdir -p /log
+		touch /log/system.log
+	}
 	
 	# temporary hack until configd exists
 	/sbin/reload_config
