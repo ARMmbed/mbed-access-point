@@ -54,6 +54,8 @@ echo "Enabling Hardware flow control on UART0" > /dev/kmsg
 echo "Restarting lldpd" > /dev/kmsg
 /etc/init.d/lldpd restart
 
+/etc/init.d/odhcpd restart
+
 set -e
 
 exit 0
