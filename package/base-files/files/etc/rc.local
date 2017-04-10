@@ -75,6 +75,12 @@ echo "Restarting lldpd" > /dev/kmsg
 
 /etc/init.d/odhcpd restart
 
+# Get routed /64 prefix and write it to NDPPD config file, and restart service after that
+ROUTED_PREFIX=$(ip -6 route show | grep "::/64 dev eth0  proto static" | awk '{print $1}')
+sed -i '/.*rule.*{.*/c\   rule '"$ROUTED_PREFIX"' {' /etc/ndppd.conf
+sed -i '/      auto/c\      iface sl0' /etc/ndppd.conf
+/etc/init.d/ndppd restart
+
 set -e
 
 exit 0
