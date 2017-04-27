@@ -63,4 +63,7 @@ else
     logger -t firewall "IPv6 prefix is missing on SLIP interface"
 fi
 
+#Forward site-local multicast traffic from slip interface to ethernet interface
+ip6tables -A forwarding_rule -i sl0 -o eth0 -j ACCEPT
+
 set -e
