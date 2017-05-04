@@ -1,0 +1,8 @@
+config mcproxy 'mcproxy'
+	option respawn '1'
+	option protocol 'MLDv1'
+
+config instance
+	option name 'proxy'
+	list upstream 'eth0'
+	list downstream 'sl0'
