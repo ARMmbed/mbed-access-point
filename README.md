@@ -1,4 +1,5 @@
-[//]: # (           Copyright (c) 2016 ARM Limited. All rights reserved.)
+
+<!--- Copyright (c) 2016 ARM Limited. All rights reserved.) --->
 
 # mbed Access Point for Thread networks
 
@@ -29,7 +30,7 @@ You will need:
 1. Raspberry Pi 2B (working as the Linux Router).
 1. [mbed 6LoWPAN Border Router HAT](https://developer.mbed.org/platforms/mbed-6LoWPAN-Border-Router-HAT/).
 1. Micro-USB cable.
-1. Mirco-SD card.
+1. Micro-SD card.
 1. Micro-SD to SD card adapter.
 1. Ethernet cable.
 
@@ -54,8 +55,8 @@ The current version of mbed Access Point doesn't support tunneling, so it needs 
 To use the pre-built image:
 
 1. Download the mbed Access Point [image!](binaries/openwrt-mbedap-v2.0.0-brcm2708-bcm2709-rpi-2-ext4-sdcard.img).
-1. Install the image on a mirco-SD card. This [link](https://www.raspberrypi.org/documentation/installation/installing-images/) provides step by step instructions.
-1. Insert the mirco-SD card into the Raspberry Pi's mirco-SD card slot.
+1. Install the image on a Mirco-SD card. This [link](https://www.raspberrypi.org/documentation/installation/installing-images/) provides step by step instructions.
+1. Insert the Mirco-SD card into the Raspberry Pi's Mirco-SD card slot.
 
 #### Generating an image from source
 
@@ -77,8 +78,8 @@ Use V=s for verbose build log:
     make V=s
     ```
 1. The generated image (.img file) is located in the directory ``./bin/brcm2708/``.
-1. Install the image on a mirco-SD card. This [link](https://www.raspberrypi.org/documentation/installation/installing-images/mac.md) provides step by step instructions.
-1. Insert the mirco-SD card into the Raspberry Pi's mirco-SD card slot.
+1. Install the image on a Mirco-SD card. This [link](https://www.raspberrypi.org/documentation/installation/installing-images/mac.md) provides step by step instructions.
+1. Insert the Mirco-SD card into the Raspberry Pi's Mirco-SD card slot.
 
 ## Prepare the mbed 6LoWPAN Border Router
 
@@ -100,7 +101,7 @@ The Thread Border Router binary with the default configuration (RF channel = 26 
 
 ___Installing___
 
-1. Connect the mbed 6LoWPAN Border Router to a laptop using the micro-USB cable.
+1. Connect the mbed 6LoWPAN Border Router to a laptop using the Micro-USB cable.
 1. Ensure that the blue jumper (RESET-EN) is in the **off** position.
 1. Program your binary on the mbed 6LoWPAN Border Router using drag and drop. Wait until the red LED stops blinking to ensure that programming is complete.
 1. Attach the mbed 6LoWPAN Border Router to the Raspberry Pi, so that it fits firmly on top of the GPIO headers.
@@ -122,8 +123,8 @@ Method 1:
 
 1. Power on the Raspberry Pi.
 1. Wait until the red LED on the Raspberry Pi stops blinking.
-1. Power off the Raspberry Pi and remove the mirco-SD card.
-1. Insert the micro-SD card into the laptop using a *micro-SD to SD card* adapter. The SD card will be mounted automatically.
+1. Power off the Raspberry Pi and remove the Mirco-SD card.
+1. Insert the Micro-SD card into the laptop using a *Micro-SD to SD card* adapter. The SD card will be mounted automatically.
 1. The IP address of the mbed Access Point is in the file "ip_address.txt".
 
 Method 2:
