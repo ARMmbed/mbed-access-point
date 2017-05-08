@@ -509,7 +509,7 @@ $(eval $(call KernelPackage,e1000e))
 define KernelPackage/igb
   SUBMENU:=$(NETWORK_DEVICES_MENU)
   TITLE:=Intel(R) 82575/82576 PCI-Express Gigabit Ethernet support
-  DEPENDS:=@PCI_SUPPORT +kmod-i2c-algo-bit +kmod-ptp
+  DEPENDS:=@PCI_SUPPORT +kmod-i2c-core +kmod-i2c-algo-bit +kmod-ptp
   KCONFIG:=CONFIG_IGB \
     CONFIG_IGB_HWMON=n \
     CONFIG_IGB_DCA=n
@@ -522,6 +522,42 @@ define KernelPackage/igb/description
 endef
 
 $(eval $(call KernelPackage,igb))
+
+define KernelPackage/igbvf
+  SUBMENU:=$(NETWORK_DEVICES_MENU)
+  TITLE:=Intel(R) 82576 Virtual Function Ethernet support
+  DEPENDS:=@PCI_SUPPORT
+  KCONFIG:=CONFIG_IGBVF \
+    CONFIG_IGB_HWMON=n \
+    CONFIG_IGB_DCA=n
+  FILES:=$(LINUX_DIR)/drivers/net/ethernet/intel/igbvf/igbvf.ko
+  AUTOLOAD:=$(call AutoLoad,35,igbvf)
+endef
+
+define KernelPackage/igbvf/description
+ Kernel modules for Intel(R) 82576 Virtual Function Ethernet adapters.
+endef
+
+$(eval $(call KernelPackage,igbvf))
+
+
+define KernelPackage/ixgbe
+  SUBMENU:=$(NETWORK_DEVICES_MENU)
+  TITLE:=Intel(R) 82598/82599 PCI-Express 10 Gigabit Ethernet support
+  DEPENDS:=@PCI_SUPPORT +kmod-mdio +kmod-ptp
+  KCONFIG:=CONFIG_IXGBE \
+    CONFIG_IXGBE_VXLAN=n \
+    CONFIG_IXGBE_HWMON=n \
+    CONFIG_IXGBE_DCA=n
+  FILES:=$(LINUX_DIR)/drivers/net/ethernet/intel/ixgbe/ixgbe.ko
+  AUTOLOAD:=$(call AutoLoad,35,ixgbe)
+endef
+
+define KernelPackage/ixgbe/description
+ Kernel modules for Intel(R) 82598/82599 PCI-Express 10 Gigabit Ethernet adapters.
+endef
+
+$(eval $(call KernelPackage,ixgbe))
 
 
 define KernelPackage/b44

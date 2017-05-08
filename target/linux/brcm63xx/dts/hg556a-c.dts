@@ -8,6 +8,10 @@
 	model = "Huawei EchoLife HG556a (version C)";
 	compatible = "huawei,hg556a-c", "brcm,bcm6358";
 
+	chosen {
+		bootargs = "root=/dev/mtdblock2 rootfstype=squashfs,jffs2 noinitrd console=ttyS0,115200";
+	};
+
 	gpio-keys-polled {
 		compatible = "gpio-keys-polled";
 		#address-cells = <1>;
@@ -17,7 +21,7 @@
 
 		help {
 			label = "help";
-			gpios = <&gpio0 8 1>;
+			gpios = <&gpio1 4 1>;
 			linux,code = <KEY_HELP>;
 		};
 		wlan {

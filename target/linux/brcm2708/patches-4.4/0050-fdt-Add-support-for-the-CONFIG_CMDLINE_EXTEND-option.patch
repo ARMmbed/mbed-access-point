@@ -1,7 +1,7 @@
-From e88c206c101194b8513860c135ee77366d7456eb Mon Sep 17 00:00:00 2001
+From 0f79afb206f238e89f1cb5c40299f6fd6a47dda3 Mon Sep 17 00:00:00 2001
 From: Phil Elwell <phil@raspberrypi.org>
 Date: Fri, 5 Dec 2014 17:26:26 +0000
-Subject: [PATCH 050/304] fdt: Add support for the CONFIG_CMDLINE_EXTEND option
+Subject: [PATCH 050/381] fdt: Add support for the CONFIG_CMDLINE_EXTEND option
 
 ---
  drivers/of/fdt.c | 29 ++++++++++++++++++++++++-----
@@ -9,15 +9,12 @@ Subject: [PATCH 050/304] fdt: Add support for the CONFIG_CMDLINE_EXTEND option
 
 --- a/drivers/of/fdt.c
 +++ b/drivers/of/fdt.c
-@@ -954,22 +954,38 @@ int __init early_init_dt_scan_chosen(uns
+@@ -954,19 +954,38 @@ int __init early_init_dt_scan_chosen(uns
  
  	/* Retrieve command line */
  	p = of_get_flat_dt_prop(node, "bootargs", &l);
 -	if (p != NULL && l > 0)
 -		strlcpy(data, p, min((int)l, COMMAND_LINE_SIZE));
--	p = of_get_flat_dt_prop(node, "bootargs-append", &l);
--	if (p != NULL && l > 0)
--		strlcat(data, p, min_t(int, strlen(data) + (int)l, COMMAND_LINE_SIZE));
  
  	/*
  	 * CONFIG_CMDLINE is meant to be a default in case nothing else

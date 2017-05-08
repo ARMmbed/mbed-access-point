@@ -65,7 +65,7 @@ define KernelPackage/ata-ahci-platform
     $(LINUX_DIR)/drivers/ata/ahci_platform.ko \
     $(LINUX_DIR)/drivers/ata/libahci_platform.ko
   AUTOLOAD:=$(call AutoLoad,40,libahci libahci_platform ahci_platform,1)
-  $(call AddDepends/ata,@TARGET_ipq806x||TARGET_mvebu||TARGET_sunxi)
+  $(call AddDepends/ata,@TARGET_ipq806x||TARGET_sunxi)
 endef
 
 define KernelPackage/ata-ahci-platform/description
@@ -124,22 +124,6 @@ endef
 $(eval $(call KernelPackage,ata-marvell-sata))
 
 
-define KernelPackage/ata-mvebu-ahci
-  TITLE:=Marvell EBU AHCI support
-  DEPENDS:=@TARGET_mvebu +kmod-ata-ahci-platform
-  KCONFIG:=CONFIG_AHCI_MVEBU
-  FILES:=$(LINUX_DIR)/drivers/ata/ahci_mvebu.ko
-  AUTOLOAD:=$(call AutoLoad,41,ahci_mvebu,1)
-  $(call AddDepends/ata)
-endef
-
-define KernelPackage/ata-mvebu-ahci/description
- AHCI support for Marvell EBU SoCs
-endef
-
-$(eval $(call KernelPackage,ata-mvebu-ahci))
-
-
 define KernelPackage/ata-nvidia-sata
   TITLE:=Nvidia Serial ATA support
   KCONFIG:=CONFIG_SATA_NV
@@ -149,22 +133,6 @@ define KernelPackage/ata-nvidia-sata
 endef
 
 $(eval $(call KernelPackage,ata-nvidia-sata))
-
-
-define KernelPackage/ata-oxnas-sata
-  TITLE:=oxnas Serial ATA support
-  KCONFIG:=CONFIG_SATA_OXNAS
-  DEPENDS:=@TARGET_oxnas
-  FILES:=$(LINUX_DIR)/drivers/ata/sata_oxnas.ko
-  AUTOLOAD:=$(call AutoLoad,41,sata_oxnas,1)
-  $(call AddDepends/ata)
-endef
-
-define KernelPackage/ata-oxnas-sata/description
- SATA support for OX934 core found in the OX82x/PLX782x SoCs
-endef
-
-$(eval $(call KernelPackage,ata-oxnas-sata))
 
 
 define KernelPackage/ata-pdc202xx-old

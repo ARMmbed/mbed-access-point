@@ -446,7 +446,11 @@ ar71xx_board_detect() {
 	*"COMFAST CF-E316N v2")
 		name="cf-e316n-v2"
 		;;
-	*"CPE210/220/510/520")
+	*"CPE210/220")
+		name="cpe210"
+		tplink_pharos_board_detect
+		;;
+	*"CPE510/520")
 		name="cpe510"
 		tplink_pharos_board_detect
 		;;
@@ -506,6 +510,9 @@ ar71xx_board_detect() {
 		;;
 	*"Domino Pi")
 		name="gl-domino"
+		;;
+	*"DW33D")
+		name="dw33d"
 		;;
 	*"EAP300 v2")
 		name="eap300v2"
@@ -595,6 +602,9 @@ ar71xx_board_detect() {
 	*MR1750)
 		name="mr1750"
 		;;
+	*MR1750v2)
+		name="mr1750v2"
+		;;
 	*MR600)
 		name="mr600"
 		;;
@@ -639,6 +649,9 @@ ar71xx_board_detect() {
 		;;
 	*"OM2P HSv2")
 		name="om2p-hsv2"
+		;;
+	*"OM2P HSv3")
+		name="om2p-hsv3"
 		;;
 	*"OM2P LC")
 		name="om2p-lc"
@@ -784,6 +797,9 @@ ar71xx_board_detect() {
 	*"Telldus TellStick ZNet Lite")
 		name="tellstick-znet-lite"
 		;;
+	*SOM9331)
+		name="som9331"
+		;;
 	*TEW-632BRP)
 		name="tew-632brp"
 		;;
@@ -807,6 +823,9 @@ ar71xx_board_detect() {
 		;;
 	*"TL-WR1043ND v2")
 		name="tl-wr1043nd-v2"
+		;;
+	*"TL-WR1043ND v4")
+		name="tl-wr1043nd-v4"
 		;;
 	*TL-WR2543N*)
 		name="tl-wr2543n"
@@ -906,6 +925,9 @@ ar71xx_board_detect() {
 		;;
 	*"TL-WR841N/ND v9")
 		name="tl-wr841n-v9"
+		;;
+	*"TL-WR841N/ND v11")
+		name="tl-wr841n-v11"
 		;;
 	*"TL-WR842N/ND v2")
 		name="tl-wr842n-v2"
@@ -1036,8 +1058,14 @@ ar71xx_board_detect() {
 	*WRT160NL)
 		name="wrt160nl"
 		;;
+	*E2100L)
+		name="e2100l"
+		;;
 	*WRT400N)
 		name="wrt400n"
+		;;
+	*"WRTnode2Q board")
+		name="wrtnode2q"
 		;;
 	*"WZR-450HP2")
 		name="wzr-450hp2"
@@ -1081,6 +1109,9 @@ ar71xx_board_detect() {
 	*"HiWiFi HC6361")
 		name="hiwifi-hc6361"
 		;;
+        *"ANONABOX_PRO")
+                name="anonabox-pro"
+                ;;
 	esac
 
 	[ -z "$AR71XX_MODEL" ] && [ "${machine:0:8}" = 'TP-LINK ' ] && \

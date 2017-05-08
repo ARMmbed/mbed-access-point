@@ -181,6 +181,7 @@ platform_check_image() {
 	alfa-ap96 | \
 	alfa-nx | \
 	arduino-yun | \
+        anonabox-pro | \
 	ap113 | \
 	ap121 | \
 	ap121-mini | \
@@ -193,6 +194,7 @@ platform_check_image() {
 	bxu2000n-2-a1 | \
 	db120 | \
 	dr344 | \
+	dw33d |\
 	f9k1115v2 |\
 	hornet-ub | \
 	mr12 | \
@@ -272,7 +274,8 @@ platform_check_image() {
 	unifiac-pro | \
 	unifi-outdoor | \
 	carambola2 | \
-	weio )
+	weio | \
+	wrtnode2q)
 		[ "$magic" != "2705" ] && {
 			echo "Invalid image type."
 			return 1
@@ -280,6 +283,7 @@ platform_check_image() {
 		return 0
 		;;
 
+	cpe210|\
 	cpe510)
 		tplink_pharos_check_image "$1" && return 0
 		return 1
@@ -292,6 +296,7 @@ platform_check_image() {
 		;;
 
 	mynet-rext|\
+	e2100l|\
 	wrt160nl)
 		cybertan_check_image "$1" && return 0
 		return 1
@@ -314,6 +319,7 @@ platform_check_image() {
 		return 0;
 		;;
 	mr1750 | \
+	mr1750v2 | \
 	mr600 | \
 	mr600v2 | \
 	mr900 | \
@@ -322,6 +328,7 @@ platform_check_image() {
 	om2pv2 | \
 	om2p-hs | \
 	om2p-hsv2 | \
+	om2p-hsv3 | \
 	om2p-lc | \
 	om5p | \
 	om5p-an | \
@@ -346,6 +353,7 @@ platform_check_image() {
 	onion-omega | \
 	oolite | \
 	smart-300 | \
+	som9331 | \
 	tellstick-znet-lite | \
 	tl-mr10u | \
 	tl-mr11u | \
@@ -385,6 +393,7 @@ platform_check_image() {
 	tl-wr841n-v7 | \
 	tl-wr841n-v8 | \
 	tl-wr841n-v9 | \
+	tl-wr841n-v11 | \
 	tl-wr842n-v2 | \
 	tl-wr842n-v3 | \
 	tl-wr941nd | \
@@ -393,6 +402,7 @@ platform_check_image() {
 	tl-wr1041n-v2 | \
 	tl-wr1043nd | \
 	tl-wr1043nd-v2 | \
+	tl-wr1043nd-v4| \
 	tl-wr2543n)
 		local magic_ver="0100"
 
@@ -573,6 +583,7 @@ platform_do_upgrade() {
 		platform_do_upgrade_dir825b "$ARGV"
 		;;
 	mr1750 | \
+	mr1750v2 | \
 	mr600 | \
 	mr600v2 | \
 	mr900 | \
@@ -581,6 +592,7 @@ platform_do_upgrade() {
 	om2pv2 | \
 	om2p-hs | \
 	om2p-hsv2 | \
+	om2p-hsv3 | \
 	om2p-lc | \
 	om5p | \
 	om5p-an | \

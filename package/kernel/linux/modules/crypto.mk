@@ -123,12 +123,11 @@ $(eval $(call KernelPackage,crypto-rng))
 define KernelPackage/crypto-iv
   TITLE:=CryptoAPI initialization vectors
   DEPENDS:=+kmod-crypto-manager +kmod-crypto-rng +kmod-crypto-wq
-  KCONFIG:= CONFIG_CRYPTO_BLKCIPHER2 CONFIG_CRYPTO_ECHAINIV
+  KCONFIG:= CONFIG_CRYPTO_BLKCIPHER2
   FILES:= \
-	$(LINUX_DIR)/crypto/eseqiv.ko \
-	$(LINUX_DIR)/crypto/chainiv.ko \
-	$(LINUX_DIR)/crypto/echainiv.ko@ge4.3
-  AUTOLOAD:=$(call AutoLoad,10,eseqiv chainiv echainiv@ge4.3)
+	$(LINUX_DIR)/crypto/eseqiv.ko@lt4.8 \
+	$(LINUX_DIR)/crypto/chainiv.ko@lt4.8
+  AUTOLOAD:=$(call AutoLoad,10,eseqiv chainiv)
   $(call AddDepends/crypto)
 endef
 
@@ -631,54 +630,6 @@ endif
 $(eval $(call KernelPackage,crypto-misc))
 
 
-define KernelPackage/crypto-ocf
-  TITLE:=OCF modules
-  DEPENDS:=+@OPENSSL_ENGINE_CRYPTO @!TARGET_uml +kmod-crypto-manager
-  KCONFIG:= \
-	CONFIG_OCF_OCF \
-	CONFIG_OCF_CRYPTODEV \
-	CONFIG_OCF_CRYPTOSOFT \
-	CONFIG_OCF_FIPS=y \
-	CONFIG_OCF_RANDOMHARVEST=y
-  FILES:= \
-	$(LINUX_DIR)/crypto/ocf/ocf.ko \
-	$(LINUX_DIR)/crypto/ocf/cryptodev.ko \
-	$(LINUX_DIR)/crypto/ocf/cryptosoft.ko
-  AUTOLOAD:=$(call AutoLoad,09, \
-	ocf \
-	cryptodev \
-	cryptosoft \
-  )
-  $(call AddDepends/crypto)
-endef
-
-$(eval $(call KernelPackage,crypto-ocf))
-
-
-define KernelPackage/crypto-ocf-hifn7751
-  TITLE:=OCF support for Hifn 6500/7751/7811/795x, Invertex AEON and NetSec 7751 devices
-  DEPENDS:=+@OPENSSL_ENGINE_CRYPTO @PCI_SUPPORT @!TARGET_uml kmod-crypto-ocf
-  KCONFIG:=CONFIG_OCF_HIFN
-  FILES:=$(LINUX_DIR)/crypto/ocf/hifn/hifn7751.ko
-  AUTOLOAD:=$(call AutoLoad,10,hifn7751)
-  $(call AddDepends/crypto)
-endef
-
-$(eval $(call KernelPackage,crypto-ocf-hifn7751))
-
-
-define KernelPackage/crypto-ocf-hifnhipp
-  TITLE:=OCF support for Hifn 7855/8155 devices
-  DEPENDS:=+@OPENSSL_ENGINE_CRYPTO @PCI_SUPPORT @!TARGET_uml kmod-crypto-ocf
-  KCONFIG:=CONFIG_OCF_HIFNHIPP
-  FILES:=$(LINUX_DIR)/crypto/ocf/hifn/hifnHIPP.ko
-  AUTOLOAD:=$(call AutoLoad,10,hifnHIPP)
-  $(call AddDepends/crypto)
-endef
-
-$(eval $(call KernelPackage,crypto-ocf-hifnhipp))
-
-
 define KernelPackage/crypto-null
   TITLE:=Null CryptoAPI module
   KCONFIG:=CONFIG_CRYPTO_NULL
@@ -714,7 +665,7 @@ $(eval $(call KernelPackage,crypto-xts))
 
 define KernelPackage/crypto-mv-cesa
   TITLE:=Marvell crypto engine
-  DEPENDS:=+kmod-crypto-manager @TARGET_kirkwood||TARGET_orion||TARGET_mvebu
+  DEPENDS:=+kmod-crypto-manager @TARGET_kirkwood||TARGET_orion
   KCONFIG:=CONFIG_CRYPTO_DEV_MV_CESA
   FILES:=$(LINUX_DIR)/drivers/crypto/mv_cesa.ko
   AUTOLOAD:=$(call AutoLoad,09,mv_cesa)

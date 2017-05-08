@@ -116,6 +116,9 @@ get_status_led() {
 	dragino2)
 		status_led="dragino2:red:system"
 		;;
+	dw33d)
+		status_led="dw33d:blue:status"
+		;;
 	eap300v2)
 		status_led="engenius:blue:power"
 		;;
@@ -176,7 +179,8 @@ get_status_led() {
 	mr600v2)
 		status_led="mr600:blue:power"
 		;;
-	mr1750)
+	mr1750 | \
+	mr1750v2)
 		status_led="mr1750:blue:power"
 		;;
 	mr900 | \
@@ -207,6 +211,7 @@ get_status_led() {
 	om2pv2 | \
 	om2p-hs | \
 	om2p-hsv2 | \
+	om2p-hsv3 | \
 	om2p-lc)
 		status_led="om2p:blue:power"
 		;;
@@ -276,6 +281,9 @@ get_status_led() {
 	tellstick-znet-lite)
 		status_led="tellstick:white:system"
 		;;
+	som9331)
+		status_led="som9331:green:system"
+		;;
 	tew-632brp)
 		status_led="tew-632brp:green:status"
 		;;
@@ -314,11 +322,13 @@ get_status_led() {
 	tl-wr1041n-v2 | \
 	tl-wr1043nd | \
 	tl-wr1043nd-v2 | \
+	tl-wr1043nd-v4| \
 	tl-wr741nd | \
 	tl-wr741nd-v4 | \
 	tl-wr841n-v1 | \
 	tl-wr841n-v7 | \
 	tl-wr841n-v8 | \
+	tl-wr841n-v11 | \
 	tl-wa830re-v2 | \
 	tl-wr842n-v2 | \
 	tl-wr842n-v3 | \
@@ -410,6 +420,9 @@ get_status_led() {
 		;;
 	wrt400n)
 		status_led="wrt400n:blue:wps"
+		;;
+	e2100l)
+		status_led="e2100l:blue:wps"
 		;;
 	wrt160nl)
 		status_led="wrt160nl:blue:wps"

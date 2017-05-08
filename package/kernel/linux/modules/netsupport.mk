@@ -286,7 +286,7 @@ IPSEC-m:= \
 define KernelPackage/ipsec
   SUBMENU:=$(NETWORK_SUPPORT_MENU)
   TITLE:=IPsec related modules (IPv4 and IPv6)
-  DEPENDS:=+kmod-crypto-authenc +kmod-crypto-iv +kmod-crypto-des +kmod-crypto-hmac +kmod-crypto-md5 +kmod-crypto-sha1 +kmod-crypto-deflate +kmod-crypto-cbc
+  DEPENDS:=+kmod-crypto-authenc +kmod-crypto-iv +kmod-crypto-des +kmod-crypto-hmac +kmod-crypto-md5 +kmod-crypto-sha1 +kmod-crypto-deflate +kmod-crypto-cbc +kmod-crypto-echainiv
   KCONFIG:= \
 	CONFIG_NET_KEY \
 	CONFIG_XFRM_USER \
@@ -300,6 +300,7 @@ define KernelPackage/ipsec/description
  Kernel modules for IPsec support in both IPv4 and IPv6.
  Includes:
  - af_key
+ - xfrm_algo
  - xfrm_ipcomp
  - xfrm_user
 endef
@@ -725,7 +726,7 @@ $(eval $(call KernelPackage,mppe))
 
 
 SCHED_MODULES = $(patsubst $(LINUX_DIR)/net/sched/%.ko,%,$(wildcard $(LINUX_DIR)/net/sched/*.ko))
-SCHED_MODULES_CORE = sch_ingress sch_fq_codel sch_hfsc cls_fw cls_route cls_flow cls_tcindex cls_u32 em_u32 act_mirred act_skbedit
+SCHED_MODULES_CORE = sch_ingress sch_fq_codel sch_hfsc sch_htb sch_tbf cls_fw cls_route cls_flow cls_tcindex cls_u32 em_u32 act_mirred act_skbedit
 SCHED_MODULES_FILTER = $(SCHED_MODULES_CORE) act_connmark sch_esfq sch_netem
 SCHED_MODULES_EXTRA = $(filter-out $(SCHED_MODULES_FILTER),$(SCHED_MODULES))
 SCHED_FILES = $(patsubst %,$(LINUX_DIR)/net/sched/%.ko,$(filter $(SCHED_MODULES_CORE),$(SCHED_MODULES)))
@@ -737,6 +738,8 @@ define KernelPackage/sched-core
   KCONFIG:= \
 	CONFIG_NET_SCHED=y \
 	CONFIG_NET_SCH_HFSC \
+	CONFIG_NET_SCH_HTB \
+	CONFIG_NET_SCH_TBF \
 	CONFIG_NET_SCH_INGRESS \
 	CONFIG_NET_SCH_FQ_CODEL \
 	CONFIG_NET_CLS=y \
@@ -790,12 +793,10 @@ define KernelPackage/sched
   KCONFIG:= \
 	CONFIG_NET_SCH_CODEL \
 	CONFIG_NET_SCH_DSMARK \
-	CONFIG_NET_SCH_HTB \
 	CONFIG_NET_SCH_FIFO \
 	CONFIG_NET_SCH_GRED \
 	CONFIG_NET_SCH_PRIO \
 	CONFIG_NET_SCH_RED \
-	CONFIG_NET_SCH_TBF \
 	CONFIG_NET_SCH_SFQ \
 	CONFIG_NET_SCH_TEQL \
 	CONFIG_NET_SCH_FQ \
@@ -1024,3 +1025,39 @@ define KernelPackage/mpls/description
 endef
 
 $(eval $(call KernelPackage,mpls))
+
+define KernelPackage/9pnet
+  SUBMENU:=$(NETWORK_SUPPORT_MENU)
+  TITLE:=Plan 9 Resource Sharing Support (9P2000)
+  DEPENDS:=@PCI_SUPPORT +kmod-virtio-pci
+  KCONFIG:= \
+	CONFIG_NET_9P=m \
+	CONFIG_NET_9P_DEBUG=n \
+	CONFIG_NET_9P_VIRTIO=m
+  FILES:= \
+	$(LINUX_DIR)/net/9p/9pnet.ko \
+	$(LINUX_DIR)/net/9p/9pnet_virtio.ko
+  AUTOLOAD:=$(call AutoLoad,29,9pnet 9pnet_virtio)
+endef
+
+define KernelPackage/9pnet/description
+  Kernel support support for
+  Plan 9 resource sharing via the 9P2000 protocol.
+endef
+
+$(eval $(call KernelPackage,9pnet))
+
+define KernelPackage/mdio
+  SUBMENU:=$(NETWORK_SUPPORT_MENU)
+  TITLE:=MDIO (clause 45) PHY support
+  KCONFIG:=CONFIG_MDIO
+  FILES:=$(LINUX_DIR)/drivers/net/mdio.ko
+  AUTOLOAD:=$(call AutoLoad,32,mdio)
+endef
+
+define KernelPackage/mdio/description
+ Kernel modules for MDIO (clause 45) PHY support
+endef
+
+$(eval $(call KernelPackage,mdio))
+

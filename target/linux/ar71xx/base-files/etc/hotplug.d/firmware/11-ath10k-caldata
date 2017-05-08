@@ -50,6 +50,10 @@ case "$FIRMWARE" in
 	dlan-pro-1200-ac)
 		ath10kcal_extract "art" 20480 2116
 		;;
+	dw33d)
+		ath10kcal_extract "art" 20480 2116
+		ath10kcal_patch_mac $(mtd_get_mac_binary art 18)
+		;;
 	mc-mac1200r)
 		ath10kcal_extract "art" 20480 2116
 		ath10kcal_patch_mac $(macaddr_add $(cat /sys/class/net/eth1/address) -1)
@@ -72,6 +76,7 @@ case "$FIRMWARE" in
 		ath10kcal_patch_mac $(macaddr_add $(cat /sys/class/net/eth0/address) +1)
 		;;
 	mr1750 | \
+	mr1750v2 | \
 	om5p-acv2)
 		ath10kcal_extract "ART" 20480 2116
 		ath10kcal_patch_mac $(macaddr_add $(cat /sys/class/net/eth0/address) +16)

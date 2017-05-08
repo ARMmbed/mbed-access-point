@@ -501,7 +501,7 @@ $(eval $(call KernelPackage,wdt-omap))
 define KernelPackage/wdt-orion
   SUBMENU:=$(OTHER_MENU)
   TITLE:=Marvell Orion Watchdog timer
-  DEPENDS:=@TARGET_orion||TARGET_kirkwood||TARGET_mvebu
+  DEPENDS:=@TARGET_orion||TARGET_kirkwood
   KCONFIG:=CONFIG_ORION_WATCHDOG
   FILES:=$(LINUX_DIR)/drivers/$(WATCHDOG_DIR)/orion_wdt.ko
   AUTOLOAD:=$(call AutoLoad,50,orion_wdt,1)
@@ -585,7 +585,7 @@ $(eval $(call KernelPackage,rtc-isl1208))
 define KernelPackage/rtc-marvell
   SUBMENU:=$(OTHER_MENU)
   TITLE:=Marvell SoC built-in RTC support
-  DEPENDS:=@RTC_SUPPORT @TARGET_kirkwood||TARGET_orion||TARGET_mvebu
+  DEPENDS:=@RTC_SUPPORT @TARGET_kirkwood||TARGET_orion
   KCONFIG:=CONFIG_RTC_DRV_MV \
 	CONFIG_RTC_CLASS=y
   FILES:=$(LINUX_DIR)/drivers/rtc/rtc-mv.ko
@@ -597,23 +597,6 @@ define KernelPackage/rtc-marvell/description
 endef
 
 $(eval $(call KernelPackage,rtc-marvell))
-
-
-define KernelPackage/rtc-armada38x
-  SUBMENU:=$(OTHER_MENU)
-  TITLE:=Marvell Armada 38x SoC built-in RTC support
-  DEPENDS:=@RTC_SUPPORT @TARGET_mvebu
-  KCONFIG:=CONFIG_RTC_DRV_ARMADA38X \
-	CONFIG_RTC_CLASS=y
-  FILES:=$(LINUX_DIR)/drivers/rtc/rtc-armada38x.ko
-  AUTOLOAD:=$(call AutoProbe,rtc-armada38x)
-endef
-
-define KernelPackage/rtc-armada38x/description
- Kernel module for Marvell Armada 38x SoC built-in RTC.
-endef
-
-$(eval $(call KernelPackage,rtc-armada38x))
 
 
 define KernelPackage/rtc-pcf8563
@@ -794,7 +777,7 @@ $(eval $(call KernelPackage,zram))
 define KernelPackage/mvsdio
   SUBMENU:=$(OTHER_MENU)
   TITLE:=Marvell SDIO support
-  DEPENDS:=@TARGET_orion||TARGET_kirkwood||TARGET_mvebu +kmod-mmc
+  DEPENDS:=@TARGET_orion||TARGET_kirkwood +kmod-mmc
   KCONFIG:=CONFIG_MMC_MVSDIO
   FILES:=$(LINUX_DIR)/drivers/mmc/host/mvsdio.ko
   AUTOLOAD:=$(call AutoProbe,mvsdio)
@@ -891,6 +874,40 @@ endef
 
 $(eval $(call KernelPackage,random-core))
 
+define KernelPackage/random-omap
+  SUBMENU:=$(OTHER_MENU)
+  TITLE:=Hardware Random Number Generator OMAP support
+  KCONFIG:=CONFIG_HW_RANDOM_OMAP
+  FILES:=$(LINUX_DIR)/drivers/char/hw_random/omap-rng.ko
+  DEPENDS:=@(TARGET_omap24xx||TARGET_omap) +kmod-random-core
+  AUTOLOAD:=$(call AutoProbe,random-omap)
+endef
+
+define KernelPackage/random-omap/description
+ Kernel module for the OMAP Random Number Generator
+ found on OMAP16xx, OMAP2/3/4/5 and AM33xx/AM43xx multimedia processors.
+endef
+
+$(eval $(call KernelPackage,random-omap))
+
+
+define KernelPackage/random-tpm
+  TITLE:= TPM hardware random support
+  SUBMENU:=$(OTHER_MENU)
+  KCONFIG:= \
+    CONFIG_HW_RANDOM_TPM=y
+  FILES:= \
+    $(LINUX_DIR)/drivers/char/hw_random/tpm-rng.ko
+  AUTOLOAD:= $(call AutoProbe, tpm-rng)
+  DEPENDS:=+kmod-random-core kmod-tpm
+endef
+
+define KernelPackage/random-tpm/description
+  TPM backed random support.
+endef
+
+$(eval $(call KernelPackage,random-tpm))
+
 
 define KernelPackage/thermal
   SUBMENU:=$(OTHER_MENU)
@@ -900,6 +917,7 @@ define KernelPackage/thermal
   KCONFIG:= \
 	CONFIG_THERMAL \
 	CONFIG_THERMAL_OF=y \
+	CONFIG_CPU_THERMAL=y \
 	CONFIG_THERMAL_DEFAULT_GOV_STEP_WISE=y \
 	CONFIG_THERMAL_DEFAULT_GOV_FAIR_SHARE=n \
 	CONFIG_THERMAL_DEFAULT_GOV_USER_SPACE=n \
@@ -921,29 +939,11 @@ endef
 $(eval $(call KernelPackage,thermal))
 
 
-define KernelPackage/thermal-armada
-  SUBMENU:=$(OTHER_MENU)
-  TITLE:=Armada 370/XP thermal management
-  DEPENDS:=@TARGET_mvebu +kmod-thermal
-  KCONFIG:=CONFIG_ARMADA_THERMAL
-  FILES:=$(LINUX_DIR)/drivers/thermal/armada_thermal.ko
-  AUTOLOAD:=$(call AutoProbe,armada_thermal)
-endef
-
-define KernelPackage/thermal-armada/description
- Enable this module if you want to have support for thermal management
- controller present in Armada 370 and Armada XP SoC.
-endef
-
-$(eval $(call KernelPackage,thermal-armada))
-
-
 define KernelPackage/thermal-imx
   SUBMENU:=$(OTHER_MENU)
   TITLE:=Temperature sensor driver for Freescale i.MX SoCs
   DEPENDS:=@TARGET_imx6 +kmod-thermal
   KCONFIG:= \
-	CONFIG_CPU_THERMAL=y \
 	CONFIG_IMX_THERMAL
   FILES:=$(LINUX_DIR)/drivers/thermal/imx_thermal.ko
   AUTOLOAD:=$(call AutoProbe,imx_thermal)
@@ -1009,3 +1009,175 @@ define KernelPackage/echo/description
 endef
 
 $(eval $(call KernelPackage,echo))
+
+
+define KernelPackage/bmp085
+  SUBMENU:=$(OTHER_MENU)
+  TITLE:=BMP085/BMP18x pressure sensor
+  DEPENDS:= +kmod-regmap @!LINUX_4_1 @!LINUX_3_18
+  KCONFIG:= CONFIG_BMP085
+  FILES:= $(LINUX_DIR)/drivers/misc/bmp085.ko
+endef
+
+define KernelPackage/bmp085/description
+ This driver adds support for Bosch Sensortec's digital pressure
+ sensors BMP085 and BMP18x.
+endef
+
+$(eval $(call KernelPackage,bmp085))
+
+
+define KernelPackage/bmp085-i2c
+  SUBMENU:=$(OTHER_MENU)
+  TITLE:=BMP085/BMP18x pressure sensor I2C
+  DEPENDS:= +kmod-bmp085
+  KCONFIG:= CONFIG_BMP085_I2C
+  FILES:= $(LINUX_DIR)/drivers/misc/bmp085-i2c.ko
+  AUTOLOAD:=$(call AutoProbe,bmp085-i2c)
+endef
+define KernelPackage/bmp085-i2c/description
+ This driver adds support for Bosch Sensortec's digital pressure
+ sensor connected via I2C.
+endef
+
+$(eval $(call KernelPackage,bmp085-i2c))
+
+
+define KernelPackage/bmp085-spi
+  SUBMENU:=$(OTHER_MENU)
+  TITLE:=BMP085/BMP18x pressure sensor SPI
+  DEPENDS:= +kmod-bmp085
+  KCONFIG:= CONFIG_BMP085_SPI
+  FILES:= $(LINUX_DIR)/drivers/misc/bmp085-spi.ko
+  AUTOLOAD:=$(call AutoProbe,bmp085-spi)
+endef
+define KernelPackage/bmp085-spi/description
+ This driver adds support for Bosch Sensortec's digital pressure
+ sensor connected via SPI.
+endef
+
+$(eval $(call KernelPackage,bmp085-spi))
+
+
+define KernelPackage/virtio-pci
+  SUBMENU:=$(OTHER_MENU)
+  DEPENDS:= @PCI_SUPPORT
+  TITLE:=Virtio PCI support
+  KCONFIG:= CONFIG_VIRTIO CONFIG_VIRTIO_PCI
+  FILES:=\
+	$(LINUX_DIR)/drivers/virtio/virtio_pci.ko \
+	$(LINUX_DIR)/drivers/virtio/virtio.ko \
+	$(LINUX_DIR)/drivers/virtio/virtio_ring.ko
+  AUTOLOAD:=$(call AutoProbe,virtio virtio_ring virtio_pci)
+endef
+define KernelPackage/virtio-pci/description
+ This driver adds virtio PCI support.
+endef
+
+$(eval $(call KernelPackage,virtio-pci))
+
+
+define KernelPackage/virtio-mmio
+  SUBMENU:=$(OTHER_MENU)
+  TITLE:=Virtio MMIO support
+  KCONFIG:= CONFIG_VIRTIO CONFIG_VIRTIO_MMIO
+  FILES:= \
+	$(LINUX_DIR)/drivers/virtio/virtio.ko \
+	$(LINUX_DIR)/drivers/virtio/virtio_ring.ko \
+	$(LINUX_DIR)/drivers/virtio/virtio_mmio.ko
+  AUTOLOAD:=$(call AutoProbe,virtio virtio_ring virtio_mmio)
+endef
+define KernelPackage/virtio-mmio/description
+ This driver adds virtio MMIO support.
+endef
+
+$(eval $(call KernelPackage,virtio-mmio))
+
+
+define KernelPackage/tpm
+  TITLE:= TPM support
+  SUBMENU:=$(OTHER_MENU)
+  KCONFIG:= \
+    CONFIG_TCG_TPM=y
+  FILES:= \
+    $(LINUX_DIR)/drivers/char/tpm/tpm.ko
+  AUTOLOAD:= $(call AutoProbe, tpm)
+endef
+
+define KernelPackage/tpm/description
+  TPM support.
+endef
+
+$(eval $(call KernelPackage,tpm))
+
+
+define KernelPackage/tpm-i2c-infineon
+  TITLE:= TPM 1.2 infineon i2c driver
+  SUBMENU:=$(OTHER_MENU)
+  KCONFIG:= \
+    CONFIG_TCG_TIS_I2C_INFINEON=y
+  FILES:= \
+    $(LINUX_DIR)/drivers/char/tpm/tpm_i2c_infineon.ko
+  AUTOLOAD:= $(call AutoProbe, tpm_i2c_infineon)
+  DEPENDS:=+kmod-tpm kmod-i2c-core
+endef
+
+define KernelPackage/tpm-i2c-infineon/description
+  TPM 1.2 support for infineon i2c devices.
+endef
+
+$(eval $(call KernelPackage,tpm-i2c-infineon))
+
+
+define KernelPackage/gpio-ich
+  TITLE:=Intel ICH GPIO support
+  SUBMENU:=$(OTHER_MENU)
+  KCONFIG:= \
+    CONFIG_GPIO_ICH
+  FILES:= \
+    $(LINUX_DIR)/drivers/gpio/gpio-ich.ko
+  AUTOLOAD:=$(call AutoLoad,55,gpio-ich)
+  DEPENDS:=@GPIO_SUPPORT
+endef
+
+define KernelPackage/gpio-ich/description
+  Intel ICH GPIO support.
+endef
+
+$(eval $(call KernelPackage,gpio-ich))
+
+
+define KernelPackage/iTCO_wdt
+  TITLE:=Intel TCO Watchdog Timer
+  SUBMENU:=$(OTHER_MENU)
+  KCONFIG:= \
+	CONFIG_ITCO_WDT \
+	CONFIG_ITCO_VENDOR_SUPPORT=n
+  FILES:= \
+	$(LINUX_DIR)/drivers/$(WATCHDOG_DIR)/iTCO_wdt.ko
+  AUTOLOAD:=$(call AutoLoad,50,iTCO_wdt,1)
+  DEPENDS:=+kmod-i2c-core
+endef
+
+define KernelPackage/iTCO_wdt/description
+  Kernel module for Intel TCO Watchdog Timer
+endef
+
+$(eval $(call KernelPackage,iTCO_wdt))
+
+
+define KernelPackage/w83627hf-wdt
+  SUBMENU:=$(OTHER_MENU)
+  TITLE:=Winbond 83627HF Watchdog Timer
+  KCONFIG:=CONFIG_W83627HF_WDT
+  FILES:=$(LINUX_DIR)/drivers/$(WATCHDOG_DIR)/w83627hf_wdt.ko
+  AUTOLOAD:=$(call AutoLoad,50,w83627hf-wdt,1)
+endef
+
+define KernelPackage/w83627hf-wdt/description
+  Kernel module for Winbond 83627HF Watchdog Timer
+endef
+
+$(eval $(call KernelPackage,w83627hf-wdt))
+
+
