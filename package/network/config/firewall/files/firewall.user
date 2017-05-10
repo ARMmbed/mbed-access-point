@@ -17,6 +17,10 @@ iptables --append input_wan_rule --protocol tcp --dport 443 --jump ACCEPT
 iptables --append input_rule --protocol udp --dport 5353 --jump ACCEPT
 # Accept incoming snmp traffic
 iptables --append input_rule --protocol udp --dport 161 --jump ACCEPT
+# Accept forwarding Thread commissioning app traffic to BR
+ip6tables --append forwarding_wan_rule --protocol udp --dport 49191 --jump ACCEPT
+# Accept forwarding traffic to port 50000 (used in testing)
+ip6tables --append forwarding_wan_rule --protocol udp --dport 50000 --jump ACCEPT
 
 #IPv6 rate-limiting
 logger -t firewall "Firewall.user called by  ???"
