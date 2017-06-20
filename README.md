@@ -1,22 +1,22 @@
 
 <!--- Copyright (c) 2016 ARM Limited. All rights reserved.) --->
 
-# mbed Access Point for Thread networks
+# mbed Access Point for Low Power Wireless Networks
 
-mbed Access Point for Thread is a wireless access point that manages Thread networks and provides the necessary features to integrate a Thread network into an IT environment and cope with existing backhaul networks. It is a combination of the mbed 6LoWPAN Border Router (Thread Border Router) and the Linux Router.    
+mbed Access Point is a wireless device that manages the low power wireless networks (Thread or 6LoWPAN). It is a combination of the mbed 6LoWPAN Border Router (Thread/6LoWPAN Border Router) and the Linux Router. It provides the necessary features to integrate the low power wireless networks into an IT environment and cope with existing backhaul networks.    
 
-This document provides instructions for building an mbed Access Point for Thread based on Raspberry Pi 2B and the mbed 6LoWPAN Border Router.
+This document provides instructions for building an mbed Access Point for low power wireless networks based on Raspberry Pi 2B and the mbed 6LoWPAN Border Router.
 
 You can:
 
 * [Use a pre-built image based on OpenWrt for Raspberry Pi 2B](#using-the-pre-built-image).
-* [Generate an image from a source with custom configuration](#generating-an-image-from-source).
+* [Generate an image from a source](#generating-an-image-from-source).
 
 ## The architecture
 
-The architecture described in this document consists of two embedded boards, an mbed 6LoWPAN Border Router and a Linux Router. The motivation behind this two-board design is to achieve a mesh-agnostic mbed Access Point: we can use either a [Thread](https://www.threadgroup.org/) or a 6LoWPAN Border Router.
+The mbed access point consists of two embedded boards, an mbed Border Router and a Linux Router. The motivation behind this design is to achieve a mesh-agnostic mbed Access Point. With this approach it is possible to build an mbed Access Point either based on a [Thread](https://www.threadgroup.org/) or a 6LoWPAN Border Router with no (or minimal) changes to the Linux Router.
 
-The Thread Border Router is an IPv6 router that routes between regular and Thread network segments. Thread is designed for highly constrained IP networking, where bandwidth or energy is in short supply. Consequently, the Thread Border Router has some additional functionality to translate between the two domains.
+The Border (or Edge) Router is an IPv6 router that routes between regular and Thread/6LoWPAN network segments. The Thread/6LoWPAN is designed for highly constrained IP networking, where bandwidth or energy is in short supply. Consequently the Border Router has some additional functionality to translate between the two domains.
 
 The Linux Router is a resource-rich device capable of running Linux or a Linux-like operating system. It provides features typically expected by IT administrators, like VLAN support, authentication and authorization services, network management and logging, tunneling support, firewall and wireless mesh network management.
 
@@ -27,7 +27,7 @@ The figure below provides an overview of the mbed Access Point hardware componen
 
 You will need:
 
-1. Raspberry Pi 2B (working as the Linux Router).
+1. Raspberry Pi 2B (Linux Router).
 1. [mbed 6LoWPAN Border Router HAT](https://developer.mbed.org/platforms/mbed-6LoWPAN-Border-Router-HAT/).
 1. Micro-USB cable.
 1. Micro-SD card.
@@ -50,17 +50,19 @@ We've all the hardware components needed. Let's start building our mbed Access P
 
 The pre-built image for Raspberry Pi 2B contains the necessary modules and packages to convert a Raspberry Pi into an OpenWrt-based Linux Router.
 
-The current version of mbed Access Point doesn't support tunneling, so it needs IPv6 support in the backbone network to set up end-to-end communication (Thread end nodes to [mbed Device Connector](https://connector.mbed.com/)). If your backbone network only supports IPv4, you can use the default LAN network prefix included in the image: it creates an isolated Thread network based on the [ULA](https://tools.ietf.org/html/rfc4193) prefix `fd00:db80::/64`, so you can set up a Thread network without IPv6 support. The limitation in this configuration is that the Thread end nodes can only talk with mbed Access Point.
+The current version of mbed Access Point requires IPv6 support in the backbone network to setup an end-to-end communication (Thread/6LoWPAN end nodes talking to [mbed Device Connector](https://connector.mbed.com/)), as tunneling support is not yet available. However, the image includes a default [ULA](https://tools.ietf.org/html/rfc4193) prefix `fd00:db80::/64`, which enables the device to set up a Thread/6LoWPAN network without IPv6 support. In this configuration, Thread/6LoWPAN end nodes can only communicate with mbed Access Point.
 
 To use the pre-built image:
 
 1. Download the mbed Access Point [image!](binaries/openwrt-mbedap-v2.0.0-brcm2708-bcm2709-rpi-2-ext4-sdcard.img).
-1. Install the image on a Mirco-SD card. This [link](https://www.raspberrypi.org/documentation/installation/installing-images/) provides step by step instructions.
+1. Install the image on a Mirco-SD card. The [link](https://www.raspberrypi.org/documentation/installation/installing-images/) provides step by step instructions.
 1. Insert the Mirco-SD card into the Raspberry Pi's Mirco-SD card slot.
+
+If you are happy with the image provided in the repository which contains the default configuration then you can skip the next section and go to [prepare the mbed border router](#prepare-the-mbed-border-router).
 
 #### Generating an image from source
 
-This repository contains the build system for an mbed Access Point based on the OpenWrt build system. This allows you to build the image from source:
+This repository contains the build system for the mbed Access Point which is based on the OpenWrt. This allows you to build the image from source:
 
 1. Install the build system [prerequisites](https://wiki.openwrt.org/doc/howto/buildroot.exigence).
 1. Clone the repository onto a local machine.
@@ -78,30 +80,21 @@ Use V=s for verbose build log:
     make V=s
     ```
 1. The generated image (.img file) is located in the directory ``./bin/brcm2708/``.
-1. Install the image on a Mirco-SD card. This [link](https://www.raspberrypi.org/documentation/installation/installing-images/mac.md) provides step by step instructions.
+1. Install the image on a Mirco-SD card. The [link](https://www.raspberrypi.org/documentation/installation/installing-images/mac.md) provides step by step instructions.
 1. Insert the Mirco-SD card into the Raspberry Pi's Mirco-SD card slot.
 
-## Prepare the mbed 6LoWPAN Border Router
-
-### The DAPLink interface
-[The mbed 6LoWPAN Border Router HAT](https://developer.mbed.org/platforms/mbed-6LoWPAN-Border-Router-HAT/) contains a DAPLINK interface that connects to the host computer over USB and provides the following interfaces:
-
-1. A driver-less HID interface that provides a channel over which the CMSIS-DAP debug protocol runs. This enables all the industry-standard toolchains to program and debug the target system.
-1. USB Disk drag and drop programming: DAPLink debug probes appear on the host computer as a USB disk. Program files in binary (.bin) and hex (.hex) formats can be copied onto the USB disk using drag and drop, which then programs them on the target system.
-1. USB Serial Port: The DAPLink debug probe also provides a USB serial port that can be bridged through to a TTL UART on the target system. The USB Serial port will appear on a Windows machine as a COM port, or on a Linux machine as a /dev/tty interface.
-
-**Tip:** More information can be found at [DAPLINK](https://docs.mbed.com/docs/mbed-os-handbook/en/latest/advanced/DAP/).
+## Prepare the mbed Border Router
 
 ### Installing the binary
 
-___Getting the binary___
+___Generating the binary___
 
-The Thread Border Router firmware is only avaialbe in binary form to mbed users. But, ARM mbed Partners can download the source from [here](https://github.com/ARMmbed/thread-testapp-private).
-The Thread Border Router binary with the default configuration (RF channel = 26 and PAN ID = 0xface) is available [here!](binaries/thread-testapp-private_gff74fb0.bin).
+The instructions to generate the binary for the mbed Border Router is available [here](https://github.com/ARMmbed/nanostack-border-router).
+**Note:** Use the pre-configured json file "configs/Thread_SLIP_Atmel_RF.json" as mbed_app.json to use SLIP protocol for backhaul network.
 
 ___Installing___
 
-1. Connect the mbed 6LoWPAN Border Router to a laptop using the Micro-USB cable.
+1. Connect the mbed 6LoWPAN Border Router to a desktop/laptop using a Micro-USB cable.
 1. Ensure that the blue jumper (RESET-EN) is in the **off** position.
 1. Program your binary on the mbed 6LoWPAN Border Router using drag and drop. Wait until the red LED stops blinking to ensure that programming is complete.
 1. Attach the mbed 6LoWPAN Border Router to the Raspberry Pi, so that it fits firmly on top of the GPIO headers.
@@ -109,15 +102,15 @@ ___Installing___
 
 **Note**: mbed 6LoWPAN Border Router will be held in reset either until LAN interface on RPi is up and has a global IPv6 addresses, or for a maximum of 20 seconds.
 
-## Communicating with the mbed Access Point through SSH or web GUI
+## Communicating with the mbed Access Point using SSH or web GUI
 
-It is possible to communicate with mbed Access Point using either SSH or web GUI. For testing, we'll use SSH to enter and execute the commands.
+The mbed Access Point supports both command line (SSH) and graphical user interface (web). For testing purpose, we'll use command line (SSH) to enter and execute the commands.
 
-**Tip:** You can also use the web GUI to configure and check the health of your mbed Access Point.
+**Tip:** You can also use the web GUI to configure and check the health of the mbed Access Point.
 
 ___Identifying the IP address___
 
-To communicate with mbed Access Point, you need to identify its IP address. You can choose either of the following methods:
+Either of the following methods can be used to identify the IP address of the mbed access point:
 
 Method 1:
 
@@ -151,15 +144,15 @@ Use root user credentials to log in.
 
 ## Testing and verifying network connectivity
 
-If you have followed all the instructions, then you should have an mbed Access Point instance capable of managing a Thread network. The next step is to perform basic tests that verify network connectivity between the Linux Router and the mbed 6LoWPAN Border Router.
+If you have followed all the instructions, then you should have an mbed Access Point capable of managing low power wireless networks. Let us create a example Thread network to perform basic tests to verify the network connectivity between the Linux Router and the mbed Border Router.
 
 ### Backbone network with IPv4 support only
 
-As described before, if your backbone network only supports IPv4, then ULA addresses are used to set up the Thread network. In this case, the scope of Thread traffic is limited to mbed Access Point, as the ULA addresses are not routable over the Internet. However, all  devices in the Thread network (mbed Access Point, the mbed 6LoWPAN Border Router and end nodes) can talk to each other.
+As described before, if your backbone network only supports IPv4, then ULA address is used to set up the Thread network. In this case, the scope of the traffic is limited to mbed Access Point, as the ULA addresses are not routable over the Internet. However, all  devices in the Thread network (mbed Access Point, the mbed Border Router and end nodes) can talk to each other.
 
-Let us try to ping the Thread Border Router from the Linux Router:
+Let us try to ping the Border Router from the Linux Router:
 
-1. Power up the Raspberry Pi and wait until both the Raspberry Pi and the Thread Border Router are up.
+1. Power up the Raspberry Pi and wait until both the Raspberry Pi and the Border Router are up.
 1. Log into Raspberry Pi (Linux Router) using SSH:
 
     ```
@@ -184,104 +177,156 @@ Let us try to ping the Thread Border Router from the Linux Router:
     fd00:db80::/64 dev sl0  proto static  metric 1024  pref medium
     fe80::/64 dev sl0  proto kernel  metric 256  pref medium
     ```
-1. Connect the Thread Border Router to your laptop using a mirco-USB cable.
-1. To monitor logs form the Thread border router, you can use terminal utilities like Minicom or PuTTY. Make sure the terminal utility is set to 115200 baud rate and 8N1.
-1. The Thread Border Router will use the router advertisements sent by the Linux Router to generate IPv6 addresses for both the backhaul and radio interfaces. Wait until the bootstrap is complete.
+1. Connect the mbed Border Router to your laptop using a mirco-USB cable.
+1. To monitor logs form the Border Router, you can use terminal utilities like Minicom or PuTTY. Make sure the terminal utility is set to 115200 baud rate and 8N1.
+1. The Border Router will use the router advertisements sent by the Linux Router to generate IPv6 addresses for both the backhaul and radio interfaces. Wait until the bootstrap is complete.
 
-    ```
-       _   ___ __  __               _            _  ___  ___
-      /_\ | _ \  \/  |  ___   _ __ | |__  ___ __| |/ _ \/ __|
-     / _ \|   / |\/| | |___| | '  \| '_ \/ -_) _` | (_) \__
-    /_/ \_\_|_\_|  |_|       |_|_|_|_.__/\___\__,_|\___/|___/
-
-    /> I'm Thread (Border) Router
-    [DBG ][cApp]: cmd tasklet init
-    [DBG ][cApp]: network_event_handler-ARM_LIB_TASKLET_INIT_EVENT
-    [DBG ][cApp]: cmdline_event-ARM_LIB_TASKLET_INIT_EVENT
-    mesh0 bootstrap ongoing..
-    eth0 ready
-    Ethernet (eth0) bootstrap ready. IP: fd00:db80::6407:8f79:ef5d:2052
-    Bootstrap ready
-    />
-    ```
-
-1. The Thread Border Router offers command-line like interface to enter the commands. Type in `ifconfig` in the terminal utility. You should see the following output:
-
-    ```
-    />ifconfig
-    Interface tun0:
-
-      State:               None
-
-    interface eth0:
-
-      State:               CONNECTED
-      Metric:              0
-      MAC-48:              4a:47:97:f5:e0:82
-                                          IPv6 if addr:
-       role[0]: fe80::4847:97ff:fef5:e082
-       role[1]: fd00:db80::6407:8f79:ef5d:2052
-
-    Interface mesh0:
-      State:               CONNECTED
-      Metric:              1000
-      Mode:                Router
-      Extension:           6LoWPAN Thread with MLE Attached
-      Bootstrap retries:   0
-      MAC:                 fc:c2:3d:00:00:03:11:ee
-      br-ula-prefix:       fd:00:0d:b8:00:00:00:00
-      radio type:          2.4GHz
-      channel page:        0
-      |-channel(s):        16,
-      Thread device configuration
-          Company:ARM ltd Model:MbedOS Ver:(1.1)
-      |-EUI64:               fc:c2:3d:00:00:03:11:ee
-      |-PSKd:                threadjpaketest
-      |-provisioning-url:    Not set
-      |-max Child count:     32
-      |-Downgrade Threshold: 23
-      |-Upgrade Threshold:   16
-      |-Reed advertisement interval:   570, 60
-      Static thread network config
-      |-networkid:         Arm Powered Core..
-      |-PSKc:              74:68:72:65:61:64:6a:70:61:6b:65:74:65:73:74:00
-      |-ML-ULA-prefix:     fd:00:0d:b8:00:00:00:00
-      |-ML-EID:            fc:c7:66:d8:d8:52:4d:20
-      |-private_mac:       87:c8:bc:36:d6:f9:0d:7a
-      |-panId:             face
-      |-extended-pan-id:   00:0d:b8:00:00:90:b9:72
-      |-Key:               00:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd:ee:ff
-        |-rotation:        3600
-        |-seq-counter:     0
-      |-Security Policy:   255
-      |-Channel:           16
-      |-link-timeout:      240 s.
-      |-timestamp:         0
-      MAC 16-bit:          00:00
-      MAC 64-bit:          87:c8:bc:36:d6:f9:0d:7a
-      IID:                 85:c8:bc:36:d6:f9:0d:7a
-      Radio if address
-       [0]: fe80::85c8:bc36:d6f9:d7a
-       [1]: fd00:db8::fcc7:66d8:d852:4d20
-       [2]: fd00:db8::ff:fe00:fc00
-       [3]: fd00:db8::ff:fe00:0
-       [4]: fd00:db8::ff:fe00:fc01
-       [5]: fd00:db80::85c8:bc36:d6f9:d7a
-    ```
-
-1. The line `role[1]: fd00:db80::6407:8f79:ef5d:2052` indicates the IPv6 address of the backhaul interface.
-1. The line `[5]: fd00:db80::85c8:bc36:d6f9:d7a` indicates the IPv6 address of radio interface.
-1. Switch to a terminal with the SSH connection to the Linux Router. Try pinging the mbed 6LoWPAN Border Router using the ULA address:
 ```
-ping6 fd00:db80::6407:8f79:ef5d:2052    // Pinging backhaul interface
-ping6 fd00:db80::85c8:bc36:d6f9:d7a     // Pinging radio interface
+[INFO][app ]: Starting NanoStack Border Router...
+[INFO][app ]: Build date: Jun 15 2017 13:48:37
+[INFO][brro]: NET_IPV6_BOOTSTRAP_AUTONOMOUS
+[INFO][app ]: Using SLIP backhaul driver...
+[DBG ][slip]: SLIP driver id: 1
+[DBG ][brro]: Backhaul driver ID: 1
+[DBG ][brro]: Create Mesh Interface
+[INFO][brro]: thread_if_id: 1
+[INFO][brro]: thread_interface_up
+[INFO][brro]: PAN ID 700
+[INFO][brro]: RF channel 16
+[DBG ][ThSA]: service init interface 1, port 61631, options 0
+[DBG ][ThSA]: service tasklet init
+[DBG ][coap]: Coap random msg ID: 31602
+[DBG ][coap]: Coap BLOCKWISE_MAX_TIME_DATA_STORED: 60
+[DBG ][ThSA]: Service 1, Uri registration uri: a/nd
+[DBG ][ThSA]: Service 1, Uri registration uri: n/mr
+[DBG ][ThSA]: service init interface 1, port 49191, options 130
+[DBG ][ThSA]: Service 2, Uri registration uri: c/mg
+[DBG ][ThSA]: Service 2, Uri registration uri: c/ag
+[DBG ][ThSA]: Service 2, Uri registration uri: c/pg
+[DBG ][ThSA]: Service 2, Uri registration uri: c/tx
+[DBG ][ThSA]: Service 2, Uri registration uri: c/cs
+[DBG ][ThSA]: Service 2, Uri registration uri: c/cg
+[DBG ][ThSA]: Service 2, Uri registration uri: c/cp
+[DBG ][ThSA]: Service 2, Uri registration uri: c/ca
+[DBG ][ThSA]: service init interface 1, port 61631, options 0
+[DBG ][ThSA]: Service 3, Uri registration uri: c/mg
+[DBG ][ThSA]: Service 3, Uri registration uri: c/ag
+[DBG ][ThSA]: Service 3, Uri registration uri: c/pg
+[DBG ][ThSA]: Service 3, Uri registration uri: c/cg
+[DBG ][ThSA]: Service 3, Uri registration uri: c/pq
+[DBG ][ThSA]: Service 3, Uri registration uri: c/es
+[DBG ][ThSA]: Service 3, Uri registration uri: c/ab
+[DBG ][ThSA]: service init interface 1, port 61631, options 0
+[DBG ][ThSA]: Service 4, Uri registration uri: d/dg
+[DBG ][ThSA]: Service 4, Uri registration uri: d/dr
+[DBG ][ThSA]: Service 4, Uri registration uri: d/dq
+[DBG ][ThSA]: service init interface 1, port 61631, options 0
+[INFO][brro]: mesh0 bootstrap ongoing...
+[DBG ][brro]: backhaul_interface_up: 1
+[DBG ][brro]: Backhaul interface ID: 2
+[DBG ][brro]: Backhaul bootstrap started
+[DBG ][ThSA]: service tasklet initialised
+[DBG ][rnvm]: platform_nvm_read() com.arm.nanostack.thread.static_link_cfg len=120
+[DBG ][rnvm]: platform_nvm_key_create() com.arm.nanostack.thread.static_link_cfg len=120
+[DBG ][rnvm]: platform_nvm_write() com.arm.nanostack.thread.static_link_cfg len=120
+[DBG ][rnvm]: platform_nvm_flush()
+[DBG ][rnvm]: platform_nvm_read() com.arm.nanostack.thread.static_link_cfg len=120
+[DBG ][slip]: slip_if_tx(): datalen = 72
+[DBG ][slip]: slip_if_tx(): datalen = 64
+[DBG ][slip]: slip_if_tx(): datalen = 56
+[DBG ][slip]: slip_if_tx(): datalen = 72
+[DBG ][slip]: slip_if_tx(): datalen = 64
+[INFO][brro]: BR interface_id: 2
+[INFO][TBRH]: Ethernet (eth0) bootstrap ready. IP: fd00:db80::995:d4e9:c379:7fe3
+[INFO][brro]: Backhaul interface addresses:
+[INFO][brro]:  [0] fe80::dc42:77ff:fe15:1abd
+[INFO][brro]:  [1] fd00:db80::995:d4e9:c379:7fe3
+[DBG ][TBRH]: Eth0 connection status: 1
+[DBG ][TBRH]: mesh0 is down
+[DBG ][slip]: slip_if_tx(): datalen = 72
+[DBG ][ThSA]: Service 3, Uri registration uri: a/as
+[DBG ][ThSA]: Service 3, Uri registration uri: a/ar
+[DBG ][ThSA]: Service 3, Uri registration uri: c/lp
+[DBG ][ThSA]: Service 3, Uri registration uri: c/la
+[DBG ][ThSA]: Service 3, Uri registration uri: a/sd
+[DBG ][ThSA]: Service 3, Uri registration uri: c/as
+[DBG ][ThSA]: Service 3, Uri registration uri: c/ps
+[DBG ][ThSA]: Service 3, Uri registration uri: c/cs
+[DBG ][ThSA]: service init interface 1, port 61631, options 0
+[DBG ][ThSA]: Service 6, Uri registration uri: a/aq
+[DBG ][ThSA]: service init interface 1, port 61631, options 0
+[DBG ][ThSA]: Service 7, Uri registration uri: a/an
+[DBG ][ThSA]: Service 7, Uri registration uri: a/ae
+[INFO][brro]: Thread bootstrap ready
+[INFO][brro]: RF interface addresses:
+[INFO][brro]:  [0] fe80::d0c9:a7ad:6815:cf0f
+[INFO][brro]:  [1] fd00:db8::2c9d:98ae:278f:d63f
+[INFO][brro]:  [2] fd00:db8::ff:fe00:9c00
+[INFO][brro]:  [3] fd00:db8::ff:fe00:fc00
+[DBG ][TBRH]: mesh0 connection status: 1
+[DBG ][TBRH]: DHCP server started
+[DBG ][CoSA]: Service 5, send CoAP request payload_len 20
+[DBG ][coap]: sn_coap_builder_calc_needed_packet_data_size_2
+[DBG ][coap]: sn_coap_protocol_build - payload len 20
+[DBG ][coap]: sn_coap_builder_2
+[DBG ][coap]: sn_coap_builder_calc_needed_packet_data_size_2
+[DBG ][coap]: sn_coap_builder_2 - message len: [36]
+[DBG ][coap]: sn_coap_protocol_build - msg id: [31602], bytes: [36]
+[DBG ][ThSA]: Service 5, CoAP TX Function - mid: 31602
+[DBG ][TBRH]: Updated fd00:db80::/64 prefix
+[DBG ][ThSA]: service recv socket data len 36
+[DBG ][coap]: sn_coap_protocol_parse
+[DBG ][CoSA]: CoAP status:0, type:0, code:2, id:31602
+[DBG ][ThSA]: Service 3, call request recv cb uri a/sd
+[DBG ][ThSA]: Service 3, Uri unregistration uri: c/tx
+[DBG ][CoSA]: Service 3, send CoAP response
+[DBG ][coap]: sn_coap_builder_calc_needed_packet_data_size_2
+[DBG ][coap]: sn_coap_protocol_build - payload len 0
+[DBG ][coap]: sn_coap_builder_2
+[DBG ][coap]: sn_coap_builder_calc_needed_packet_data_size_2
+[DBG ][coap]: sn_coap_builder_2 - message len: [10]
+[DBG ][coap]: sn_coap_protocol_build - msg id: [31602], bytes: [10]
+[DBG ][ThSA]: Service 3, CoAP TX Function - mid: 31602
+[DBG ][ThCH]: send from source address fd:00:0d:b8:00:00:00:00:00:00:00:ff:fe:00:9c:00
+[DBG ][slip]: slip_if_tx(): datalen = 72
+[DBG ][slip]: slip_if_tx(): datalen = 106
+[DBG ][ThSA]: service recv socket data len 10
+[DBG ][coap]: sn_coap_protocol_parse
+[DBG ][CoSA]: CoAP status:0, type:32, code:68, id:31602
+[DBG ][CoSA]: Service 5, response received
+[DBG ][slip]: slip_if_tx(): datalen = 72
+[DBG ][slip]: slip_if_tx(): datalen = 162
+[DBG ][slip]: slip_if_tx(): datalen = 162
+[DBG ][slip]: slip_if_tx(): datalen = 162
+[DBG ][slip]: slip_if_tx(): datalen = 72
+[DBG ][slip]: slip_if_tx(): datalen = 228
+[DBG ][slip]: slip_if_tx(): datalen = 228
+[INFO][app ]: Heap size: 50000, Reserved: 16948, Reserved max: 18832, Alloc fail: 0
+[INFO][brro]: Backhaul interface addresses:
+[INFO][brro]:  [0] fe80::dc42:77ff:fe15:1abd
+[INFO][brro]:  [1] fd00:db80::995:d4e9:c379:7fe3
+[INFO][brro]: RF interface addresses:
+[INFO][brro]:  [0] fe80::d0c9:a7ad:6815:cf0f
+[INFO][brro]:  [1] fd00:db8::2c9d:98ae:278f:d63f
+[INFO][brro]:  [2] fd00:db8::ff:fe00:9c00
+[INFO][brro]:  [3] fd00:db8::ff:fe00:fc00
+[INFO][brro]:  [4] fd00:db8::ff:fe00:fc01
+[INFO][brro]:  [5] fd00:db80::d0c9:a7ad:6815:cf0f
+```
+
+1. The line `[INFO][brro]:  [1] fd00:db80::995:d4e9:c379:7fe3` indicates the IPv6 address of the backhaul interface.
+1. The line `[INFO][brro]:  [5] fd00:db80::d0c9:a7ad:6815:cf0f` indicates the IPv6 address of radio interface.
+1. Switch to a terminal with the SSH connection to the Linux Router. Try pinging the mbed Border Router using the ULA address:
+```
+ping6 fd00:db80::995:d4e9:c379:7fe3    // Pinging backhaul interface
+ping6 fd00:db80::d0c9:a7ad:6815:cf0f     // Pinging radio interface
 ```
 
 ### Backbone network with IPv6 and DHCP-PD support
-The mbed Access Point includes odhcp6c module, which is a minimal DHCPv6 and RA-client. odhcp6c supports RA + stateful DHCPv6 (either IA_NA or IA_PD or both). If your backbone supports IPv6 and DHCP-PD, then the odhcp6c will request the global prefix from the backbone router and configure the Thread network according to the prefix received.
+The mbed Access Point includes odhcp6c module, which is a minimal DHCPv6 and RA-client. odhcp6c supports RA + stateful DHCPv6 (either IA_NA or IA_PD or both). If the backbone supports IPv6 and DHCP-PD, then odhcp6c will request a global prefix from the backbone router and configure the Thread network according to the prefix received.
 
-### Creating a Thread Network
-Congratulations!! You have just created an mbed Access Point for Thread. It's time to explore the world of Thread networks. Follow the instructions described in [mbed-os-example-client](https://github.com/ARMmbed/mbed-os-example-client) to set up Thread end nodes.
+### Creating a Thread network
+Congratulations!! You have just created an mbed Access Point for Thread network. Follow the instructions described in [mbed-os-example-client](https://github.com/ARMmbed/mbed-os-example-client) to set up Thread end nodes.
 
 **Tip:** Please ignore the instructions regarding the border router, as it is part of the mbed Access Point.
 
@@ -289,6 +334,6 @@ The end nodes will send LWM2M registration messages to mbed Device Connector.
 
 **Note:** If your backbone network doesn't support IPv6 then these messages will not be sent out of the mbed Access Point; you should still be able to ping all the end nodes from the mbed Access Point.
 
-If you have any questions or would like to start a discussion then please create an issue in the [mbed Access Point GitHub repository](https://github.com/ARMmbed/mbed-access-point-private).
+If you have any questions or would like to start a discussion then please create an issue in the [mbed Access Point GitHub repository](https://github.com/ARMmbed/mbed-access-point).
 
 This work is partially supported by the [Horizon 2020 programme](http://ec.europa.eu/programmes/horizon2020/) of the European Union, under grant agreement number 644332.
