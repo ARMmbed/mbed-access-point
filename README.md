@@ -14,9 +14,9 @@ You can:
 
 The mbed access point consists of two embedded boards, an mbed Border Router and a Linux Router:
 
-The Border (or Edge) Router is an IPv6 router that routes between regular and Thread/6LoWPAN network segments. The Thread/6LoWPAN is designed for highly constrained IP networking, where bandwidth or energy is in short supply. Consequently, the Border Router has some additional functionality to translate between the two domains.
+The Border (or Edge) Router is an IPv6 router that routes between regular and Thread/6LoWPAN network segments. The Thread and 6LoWPAN are designed for highly constrained IP networking, where bandwidth or energy is in short supply. Consequently, the Border Router has some additional functionality to translate between the two domains.
 
-The Linux Router is a resource-rich device capable of running Linux or a Linux-like operating system. It provides features, such as VLAN support, authentication and authorization services, network management and logging, tunneling support, firewall and wireless mesh network management, that IT administrators typically expect.
+The Linux Router is a powerful device capable of running Linux or a Linux-like operating system. It provides features, such as VLAN support, authentication and authorization services, network management and logging, tunneling support, firewall and wireless mesh network management, that IT administrators typically expect.
 
 This design makes the access point mesh-agnostic, so it can work with both a [Thread](https://www.threadgroup.org/) and a 6LoWPAN Border Router with no (or minimal) changes to the Linux Router.
 
