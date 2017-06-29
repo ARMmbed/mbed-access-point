@@ -8,8 +8,6 @@
 
 set +e
 
-logger -t firewall "Firewall.user called by  ???"
-
 # Accept ssh traffic on wan port
 iptables --append input_wan_rule --protocol tcp --dport 22 --jump ACCEPT
 ip6tables --append input_wan_rule --protocol tcp --dport 22 --jump ACCEPT
