@@ -369,92 +369,14 @@ The mbed access point includes `odhcp6c` module, which is a minimal DHCPv6 and R
               RX bytes:18553 (18.1 KiB)  TX bytes:31117 (30.3 KiB)
     ```
 
-1. Verify mbed access point has internet connectivity:
+1. Verify mbed access point has internet connectivity as described in [Backbone network with IPv4 support only](#backbone-network-with-IPv4-support-only).
 
-```
-root@OpenWrt:~# ping6 ipv6.google.com
-PING ipv6.google.com(li-in-x66.1e100.net) 56 data bytes
-64 bytes from li-in-x66.1e100.net: icmp_seq=1 ttl=45 time=40.4 ms
-64 bytes from li-in-x66.1e100.net: icmp_seq=2 ttl=45 time=71.4 ms
-64 bytes from li-in-x66.1e100.net: icmp_seq=3 ttl=45 time=76.2 ms
-```
-
-1. Connect a FRDM-K64F or similar end node to PC using USB serial port cable.  Please see [mbed-client-cliapp](https://github.com/ARMmbed/mbed-client-cliapp). Configure the end node with same RF channel, network key and PAN ID which you configured to BR HAT settings.
-
-Example configuration:
-
-```
-ifconfig --mode host
-ifconfig --extension Thread --master-key ff:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd:ee:ff --ch 26 --panid face
-ifup
-```
-
-Verify end node has received a global IP address from BBR:
-
-```
-Interface mesh0:
-  State:               CONNECTED
-...
-Radio if address
-   [0]: fe80::c4dc:a088:70ba:f70b
-   [1]: fd00:db8::f729:32e5:ccf4:c69d
-   [2]: 2001:999:41:558b:c4dc:a088:70ba:f70b
-   [3]: fd00:db8::ff:fe00:2800
-```
-
-Ping the end node from mbed access point using IP address you just found out:
-
-```
-**root@OpenWrt:~# ping6 2001:999:41:558b:c4dc:a088:70ba:f70b**
-PING 2001:999:41:558b:c4dc:a088:70ba:f70b(2001:999:41:558b:c4dc:a088:70ba:f70b) 56 data bytes
-64 bytes from 2001:999:41:558b:c4dc:a088:70ba:f70b: icmp_seq=1 ttl=63 time=33.8 ms
-```
-
-Note also that end node should be automatically added to routing table:
-
-```
-**root@OpenWrt:~# ip -6 route**
-default from 2001:999:41:558b:cd6:bd3c:5679:3 via fe80::ed6:bdff:fe3c:5679 dev eth0  proto static  metric 384  pref medium
-default from 2001:999:41:558b::/64 via fe80::ed6:bdff:fe3c:5679 dev eth0  proto static  metric 384  pref medium
-2001:999:41:558b:a00:27ff:feb6:99a6 dev sl0  proto static  metric 1024  pref medium
-2001:999:41:558b:cd6:bd3c:5679:3 dev sl0  proto static  metric 1024  pref medium
-2001:999:41:558b:ba27:ebff:fece:2508 dev sl0  proto static  metric 128  pref medium
-2001:999:41:558b:ba27:ebff:fece:2508 dev sl0  proto static  metric 1024  pref medium
-**2001:999:41:558b:c4dc:a088:70ba:f70b dev sl0  proto static  metric 128  pref medium**
-2001:999:41:558b::/64 dev eth0  proto static  metric 256  pref medium
-fd00:db80::1 dev sl0  proto static  metric 1024  pref medium
-fd00:db80::/64 dev sl0  proto static  metric 1024  pref medium
-unreachable fd00:db80::/64 dev lo  proto static  metric 2147483647  error -113 pref medium
-fe80::/64 dev sl0  proto kernel  metric 256  pref medium
-fe80::/64 dev eth0  proto kernel  metric 256  pref medium
-```
-
-Ping the mbed access point from end node:
-
-```
-**/>ping6  2001:999:41:558b:ba27:ebff:fece:2508**
-Pinging [2001:999:41:558b:ba27:ebff:fece:2508] with 56 bytes of data:
-Reply[0001] from 2001:999:41:558b:ba27:ebff:fece:2508: bytes=60 time=71ms
-Ping statistics for 2001:999:41:558b:ba27:ebff:fece:2508:
-Packets: Sent = 1, Received: 1, Lost = 0 (0.000000 loss),
-```
-
-1. Ping the mbed connector server from end node to verify internet connectivity:
-
-```
-/>ping6 -mbed
-Pinging [2607:f0d0:2601:52::20] with 56 bytes of data:
-...
-Reply[0001] from 2607:f0d0:2601:52::20: bytes=60 time=295ms
-Ping statistics for 2607:f0d0:2601:52::20:
-Packets: Sent = 1, Received: 1, Lost = 0 (0.000000 loss),
-```
 
 #### Thread commissioning application test
 
 Install the Thread Commissioning app to your smartphone or similar device (for Android it is available [here](https://play.google.com/store/apps/details?id=org.threadgroup.commissioner))
 
-When mbed access point is up and running, start the application and see if the ARM-BRx appers in the list if available border routers. Please note that the IP address shown is the address of Border Router, not the address of access point.
+When mbed access point is up and running, start the application and see if the ARM-BRx appers in the list of available border routers. Please note that the IP address shown is the address of Border Router, not the address of access point.
 
 Connect to BR by clicking it. Enter password when asked (default password is "Thread Network"). You should now be able to view BR settings (channel, PANID, etc). 
 
