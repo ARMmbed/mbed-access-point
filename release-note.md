@@ -8,6 +8,11 @@ This release also includes the following improvements:
 * Syslog support to remotely record and monitor the debug logs.
 * Forwarding multicast traffic between Thread and backbone networks.
 
+**Known Issues:**  
+The kernel routing table of the mbed access point gets corrupted, if the up-link of the upstream router is lost/disconnected. This will result in traffic towards the Ethernet interface to be forwarded to the SLIP interface.  
+**Possible Solution:**  
+At this point, the only possible solution is to **reboot** the mbed access point which will fix this.  
+
 ## mbedap-v2.0.0 - 4 Nov 2016
 
 This release introduces the support for the Thread network. In addition, this release adds the firewall rules to rate-limit the traffic toward the Thread network. It also adds support for hot-plugging of the mbed 6LoWPAN Border Router HAT.
