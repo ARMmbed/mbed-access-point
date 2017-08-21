@@ -10,12 +10,18 @@ set +e
 
 # Accept ssh traffic on wan port
 iptables --append input_wan_rule --protocol tcp --dport 22 --jump ACCEPT
+ip6tables --append input_wan_rule --protocol tcp --dport 22 --jump ACCEPT
 # Accept https traffic on wan port
 iptables --append input_wan_rule --protocol tcp --dport 443 --jump ACCEPT
 # Accept incoming mdns traffic
 iptables --append input_rule --protocol udp --dport 5353 --jump ACCEPT
 # Accept incoming snmp traffic
 iptables --append input_rule --protocol udp --dport 161 --jump ACCEPT
+# Accept forwarding Thread commissioning app traffic to BR
+ip6tables --append forwarding_wan_rule --protocol udp --dport 49191 --jump ACCEPT
+# Accept forwarding traffic to port 50000 (used in testing)
+ip6tables --append forwarding_wan_rule --protocol udp --dport 50000 --jump ACCEPT
+ip6tables --append input_wan_rule --protocol udp --dport 50000 --jump ACCEPT
 
 #IPv6 rate-limiting
 logger -t firewall "Firewall.user called by  ???"
@@ -65,5 +71,9 @@ fi
 
 #Forward site-local multicast traffic from slip interface to ethernet interface
 ip6tables -A forwarding_rule -i sl0 -o eth0 -j ACCEPT
+
+# Allow outgoing echo reply
+#ip6tables --append output_rule --protocol icmpv6 --icmpv6-type echo-reply --jump ACCEPT
+#ip6tables --append forwarding_rule --protocol icmpv6 --icmpv6-type echo-reply --jump ACCEPT
 
 set -e

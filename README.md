@@ -3,11 +3,11 @@
 
 # mbed Access Point for Low Power Wireless Networks
 
-This document provides instructions for building an mbed Access Point for low power wireless networks (Thread or 6LoWPAN) based on Raspberry Pi 2B and the mbed 6LoWPAN Border Router. The mbed access point provides the necessary features to integrate and manage low power wireless networks into an IT environment and cope with existing backhaul networks.
+This document provides instructions for building an mbed Access Point for low power wireless networks (Thread or 6LoWPAN) based on Raspberry Pi and the mbed 6LoWPAN Border Router. The mbed access point provides the necessary features to integrate and manage low power wireless networks into an IT environment and cope with existing backhaul networks.
 
 You can:
 
-* [Use a prebuilt image based on OpenWrt for Raspberry Pi 2B](#using-the-prebuilt-image).
+* [Use a prebuilt image based on OpenWrt for Raspberry Pi](#using-the-prebuilt-image).
 * [Generate an image from a source](#generating-an-image-from-source).
 
 ## The architecture
@@ -28,7 +28,7 @@ The figure below provides an overview of the access point's hardware components:
 
 You need:
 
-1. Raspberry Pi 2B (Linux Router).
+1. Raspberry Pi 2B or Raspberry Pi 3 (Linux Router).
 1. [mbed 6LoWPAN Border Router HAT](https://developer.mbed.org/platforms/mbed-6LoWPAN-Border-Router-HAT/).
 1. Micro-USB cable.
 1. Micro-SD card.
@@ -49,17 +49,18 @@ Once you have all the hardware components needed, you can start building the mbe
 
 #### Using the prebuilt image
 
-The prebuilt image for Raspberry Pi 2B contains the necessary modules and packages to convert a Raspberry Pi into an OpenWrt-based Linux Router.
+The prebuilt image for Raspberry Pi contains the necessary modules and packages to create an OpenWrt-based Linux Router.
 
 The current version of mbed Access Point requires IPv6 support in the backbone network to set up end-to-end communication (Thread/6LoWPAN end nodes talking to [mbed Device Connector](https://connector.mbed.com/)) because tunneling support is not yet available. However, the image includes a default [ULA](https://tools.ietf.org/html/rfc4193) prefix `fd00:db80::/64`, which enables the device to set up a Thread/6LoWPAN network without IPv6 support. In this configuration, Thread/6LoWPAN end nodes can only communicate with mbed Access Point.
 
 To use the prebuilt image:
 
-1. Download the mbed Access Point [image!](binaries/openwrt-mbedap-v2.0.0-brcm2708-bcm2709-rpi-2-ext4-sdcard.img).
-1. Install the image on a Micro-SD card. The [link](https://www.raspberrypi.org/documentation/installation/installing-images/) provides step-by-step instructions.
-1. Insert the Micro-SD card into the Raspberry Pi's Micro-SD card slot.
+1. Download the mbed Access Point [image](binaries/openwrt-mbedap-v3.0.0-3-gccf7c85a88-brcm2708-bcm2709-rpi-2-ext4-sdcard.img.gz) for Raspberry Pi 2B.
+1. Download the mbed Access Point [image](binaries/openwrt-mbedap-v3.0.0-3-gccf7c85a88-brcm2708-bcm2710-rpi-3-ext4-sdcard.img.gz) for Raspberry Pi 3.
+2. Install the image on a micro-SD card. This [link](https://www.raspberrypi.org/documentation/installation/installing-images/) provides step by step instructions.
+3. Insert the micro-SD card into the Raspberry Pi's micro-SD card slot.
 
-If you are happy with the image provided in the repository, which contains the default configuration, then you can skip the next section and go to [prepare the mbed border router](#prepare-the-mbed-border-router).
+If you are OK with the default configuration provided in the image then you can skip the next section and go to [prepare the mbed border router](#prepare-the-mbed-border-router).
 
 #### Generating an image from source
 
@@ -67,10 +68,9 @@ This repository contains the build system for the mbed Access Point, which is ba
 
 1. Install the build system [prerequisites](https://wiki.openwrt.org/doc/howto/buildroot.exigence).
 1. Clone the repository onto a local machine.
-1. Run `./scripts/feeds update -a` to get all the latest package definitions defined in `feeds.conf.default`.
-1. Run `./scripts/feeds install -a` to install symlinks of them into `package/feeds/`.
-1. Run `make menuconfig` to change the configuration for your image.
-1. Run Make to build the mbed Access Point image.
+1. Run `./prepare.sh rpi2|rpi3` to update and install feeds, and to install custom kernel configuration for Raspberry Pi 2B / 3.
+1. Make your own changes using `make menuconfig` (optional)
+1. Run make to build the mbed Access Point image.
 
     ```
     make
@@ -80,9 +80,9 @@ Use V=s for verbose build log:
     ```
     make V=s
     ```
-1. The generated image (``.img` file) is in the directory ``./bin/brcm2708/``.
-1. Install the image on a Micro-SD card. The [link](https://www.raspberrypi.org/documentation/installation/installing-images/mac.md) provides step-by-step instructions.
-1. Insert the Micro-SD card into the Raspberry Pi's Micro-SD card slot.
+1. The generated image (.img file) is located in the directory ``./bin/brcm2708/``.
+1. Install the image on a micro-SD card. This [link](https://www.raspberrypi.org/documentation/installation/installing-images/mac.md) provides step by step instructions.
+1. Insert the micro-SD card into the Raspberry Pi's micro-SD card slot.
 
 ## Prepare the mbed Border Router
 
@@ -334,6 +334,55 @@ ping6 fd00:db80::d0c9:a7ad:6815:cf0f     // Pinging radio interface
 ### Backbone network with IPv6 and DHCP-PD support
 
 The mbed access point includes `odhcp6c` module, which is a minimal DHCPv6 and RA-client. `odhcp6c` supports RA + stateful DHCPv6 (IA_NA or IA_PD or both). If the backbone supports IPv6 and DHCP-PD, then `odhcp6c` requests a global prefix from the backbone router and configures the Thread network according to the prefix received.
+
+### Backbone network with IPv6 and without DHCP-PD support
+The mbed access point uses Neighbour Discovery Proxy (NDP) if the backbone network doesn't support DHCP-PD. The NDP enables seamless communication between backbone and low power wireless network even when only /64 prefix is available on the WAN interface.
+
+#### Ping test
+
+1. Connect the mbed access point to a network with IPv6 support and internet access.
+1. Power up the mbed access point and wait until both the Raspberry Pi and the mbed Border Router are up.
+1. Log into mbed access point using SSH:
+
+    ```
+    ssh root@<mbed access point ip address>
+    ```
+
+1. Run the `ifconfig` command and ensure global IPv6 address has been set up on eth0 and sl0 interfaces:
+
+    ```
+    eth0      Link encap:Ethernet  HWaddr B8:27:EB:CE:25:08
+              inet addr:192.168.100.21  Bcast:192.168.100.255  Mask:255.255.255.0
+              inet6 addr: 2001:999:41:558b:ba27:ebff:fece:2508/64 Scope:Global
+              inet6 addr: fe80::ba27:ebff:fece:2508/64 Scope:Link
+              UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+              RX packets:742 errors:0 dropped:0 overruns:0 frame:0
+              TX packets:516 errors:0 dropped:0 overruns:0 carrier:0
+              collisions:0 txqueuelen:1000
+              RX bytes:219675 (214.5 KiB)  TX bytes:76816 (75.0 KiB)
+    ...
+    sl0       Link encap:UNSPEC  HWaddr 00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00
+              inet addr:10.99.99.1  P-t-P:10.99.99.1  Mask:255.255.255.0
+              inet6 addr: 2001:999:41:558b:ba27:ebff:fece:2508/64 Scope:Global
+              inet6 addr: fe80::1d94:7413:35ea:16c2/64 Scope:Link
+              inet6 addr: fd00:db80::1/64 Scope:Global
+              UP POINTOPOINT RUNNING NOARP MULTICAST  MTU:1500  Metric:1
+              RX packets:284 errors:0 dropped:0 overruns:0 frame:0
+              TX packets:306 errors:0 dropped:0 overruns:0 carrier:0
+              collisions:0 txqueuelen:10
+              RX bytes:18553 (18.1 KiB)  TX bytes:31117 (30.3 KiB)
+    ```
+
+1. Verify mbed access point has internet connectivity as described in [Backbone network with IPv4 support only](#backbone-network-with-IPv4-support-only).
+
+
+#### Thread commissioning application test
+
+Install the Thread Commissioning app to your smartphone or similar device (for Android it is available [here](https://play.google.com/store/apps/details?id=org.threadgroup.commissioner))
+
+When mbed access point is up and running, start the application and see if the ARM-BRx appers in the list of available border routers. Please note that the IP address shown is the address of Border Router, not the address of access point.
+
+Connect to BR by clicking it. Enter password when asked (default password is "Thread Network"). You should now be able to view BR settings (channel, PANID, etc).
 
 ### Creating a Thread network
 
