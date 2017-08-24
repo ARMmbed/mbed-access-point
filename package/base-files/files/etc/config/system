@@ -1,5 +1,5 @@
 config system
-	option hostname	OpenWrt
+	option hostname	mbedAP
 	option timezone	GMT0BST,M3.5.0/1,M10.5.0
 	option ttylogin	0
 	option log_file '/log/system.log'

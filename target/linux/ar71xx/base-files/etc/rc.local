@@ -1,0 +1,72 @@
+# Put your custom commands here that should be executed once
+# the system init finished. By default this file does nothing.
+
+set +e
+
+IP_ADDR_FILE=/tmp/ip_address.txt
+if [ -x /sbin/ip ] ; then
+    IP_CMD=/sbin/ip
+elif [ -x /usr/bin/ip ] ; then
+    IP_CMD=/usr/bin/ip
+fi
+
+# Forward all multicast packets to all ports. Needed only in bridge mode.
+if [ -e /sys/devices/virtual/net/br-lan/bridge/multicast_snooping ] ; then
+    echo "0" > /sys/devices/virtual/net/br-lan/bridge/multicast_snooping
+fi
+
+timeout=20
+while [ $timeout -gt 0 ];  do
+    _SLIP=$($IP_CMD addr | grep 'sl0' -A5 | grep 'inet6' | grep 'scope global' | awk '{print $2}')
+    if [ "$_SLIP" != "" ];  then
+        echo "sl0: Global ip address - $_SLIP" > /dev/kmsg
+        break
+    fi
+    timeout=$((timeout-1))
+    sleep 1
+done
+
+timeout=20
+cat /dev/null > $IP_ADDR_FILE
+# Print the IP address
+while [ $timeout -gt 0 ] ; do
+    _IPv4=$($IP_CMD addr | grep 'inet.*eth0$' | awk '{print $2}' | cut -f1  -d'/')
+    if [ "$_IPv4" != "" ] ; then
+        echo "IPv4 address is $_IPv4" >> $IP_ADDR_FILE
+        echo "IPv4 address is $_IPv4" > /dev/kmsg
+        break
+    fi
+    timeout=$((timeout-1))
+    sleep 1
+done
+
+# Default RA interval is usually between 200-600s
+timeout=600
+while [ $timeout -gt 0 ] ; do                                                                     
+    _IPv6=$($IP_CMD addr show dev eth0 | grep 'inet6.*global' | awk '{print $2}' | cut -f1  -d'/')
+    if [ "$_IPv6" != "" ] ; then                            
+	echo "IPv6 address is $_IPv6" >> $IP_ADDR_FILE
+        echo "IPv6 address is $_IPv6" > /dev/kmsg           
+        break                                               
+    fi                                                      
+    timeout=$((timeout-1))                                 
+    sleep 1                                                
+done 
+
+# Restart lldpd to ensure we are advertising on WAN as well
+echo "Restarting lldpd" > /dev/kmsg
+/etc/init.d/lldpd restart
+
+echo "Restarting odhcpd" > /dev/kmsg
+/etc/init.d/odhcpd restart
+
+# Get routed /64 prefix and write it to NDPPD config file, and restart service after that
+ROUTED_PREFIX=$(ip -6 route show dev eth0 | grep "::/64 dev eth0" | grep -v "fe80" | awk '{print $1}')
+sed -i '/.*rule.*{.*/c\   rule '"$ROUTED_PREFIX"' {' /etc/ndppd.conf
+LAN_INTERFACE=$(uci get network.lan.ifname)
+sed -i '/      auto/c\      iface '"$LAN_INTERFACE"'' /etc/ndppd.conf
+/etc/init.d/ndppd restart
+
+set -e
+
+exit 0

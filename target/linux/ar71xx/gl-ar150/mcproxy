@@ -5,4 +5,4 @@ config mcproxy 'mcproxy'
 config instance
 	option name 'proxy'
 	list upstream 'eth0'
-	list downstream 'sl0'
+	list downstream 'eth1'

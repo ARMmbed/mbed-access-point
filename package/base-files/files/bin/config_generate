@@ -16,7 +16,7 @@ generate_static_network() {
 		set network.loopback.netmask='255.0.0.0'
 		delete network.globals
 		set network.globals='globals'
-		set network.globals.ula_prefix='fd00:db80::/64'
+		set network.globals.ula_prefix='auto'
 	EOF
 
 	if json_is_a dsl object; then
