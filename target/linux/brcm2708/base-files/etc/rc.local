@@ -3,7 +3,7 @@
 
 set +e
 
-IP_ADDR_FILE=/tmp/ip_address.txt
+IP_ADDR_FILE=/boot/ip_address.txt
 if [ -x /sbin/ip ] ; then
     IP_CMD=/sbin/ip
 elif [ -x /usr/bin/ip ] ; then
@@ -25,6 +25,21 @@ while [ $timeout -gt 0 ];  do
     timeout=$((timeout-1))
     sleep 1
 done
+
+if [ -f /sys/class/gpio/export ];   then
+    echo 21 > /sys/class/gpio/export
+    sleep 1
+    if [ -d /sys/class/gpio/gpio21 ] && [ -f /sys/class/gpio/gpio21/direction ]; then
+        echo out > /sys/class/gpio/gpio21/direction
+    fi
+else
+    echo "Unable to generate GPIO 21 configuration files" > /dev/kmsg
+fi
+                                                            
+GPFSEL1=$(devmem 0x3F200004)                               
+GPFSEL1=$(($GPFSEL1|0x00FC0000))                           
+devmem 0x3F200004 32 $GPFSEL1                              
+echo "Enabling Hardware flow control on UART0" > /dev/kmsg 
 
 timeout=20
 cat /dev/null > $IP_ADDR_FILE
@@ -57,7 +72,6 @@ done
 echo "Restarting lldpd" > /dev/kmsg
 /etc/init.d/lldpd restart
 
-echo "Restarting odhcpd" > /dev/kmsg
 /etc/init.d/odhcpd restart
 
 # Get routed /64 prefix and write it to NDPPD config file, and restart service after that

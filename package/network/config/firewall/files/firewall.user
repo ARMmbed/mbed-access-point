@@ -73,7 +73,7 @@ fi
 ip6tables -A forwarding_rule -i sl0 -o eth0 -j ACCEPT
 
 # Allow outgoing echo reply
-#ip6tables --append output_rule --protocol icmpv6 --icmpv6-type echo-reply --jump ACCEPT
-#ip6tables --append forwarding_rule --protocol icmpv6 --icmpv6-type echo-reply --jump ACCEPT
+ip6tables --append output_rule --protocol icmpv6 --icmpv6-type echo-reply --jump ACCEPT
+ip6tables --append forwarding_rule --protocol icmpv6 --icmpv6-type echo-reply --jump ACCEPT
 
 set -e
