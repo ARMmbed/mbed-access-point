@@ -336,7 +336,19 @@ ping6 fd00:db80::d0c9:a7ad:6815:cf0f     // Pinging radio interface
 The mbed access point includes `odhcp6c` module, which is a minimal DHCPv6 and RA-client. `odhcp6c` supports RA + stateful DHCPv6 (IA_NA or IA_PD or both). If the backbone supports IPv6 and DHCP-PD, then `odhcp6c` requests a global prefix from the backbone router and configures the Thread network according to the prefix received.
 
 ### Backbone network with IPv6 and without DHCP-PD support
-The mbed access point uses Neighbour Discovery Proxy (NDP) if the backbone network doesn't support DHCP-PD. The NDP enables seamless communication between backbone and low power wireless network even when only /64 prefix is available on the WAN interface.
+The mbed access point uses Neighbour Discovery Proxy (NDP) if the backbone network doesn't support DHCP-PD. The NDP enables seamless communication between backbone and low power wireless network even when only /64 prefix is available on the WAN interface. The boolean config option "support_slip" needs to be added to `/etc/config/dhcp` to enable NDP support for SLIP interface.
+
+```
+config dhcp 'lan'
+	option interface 'lan'
+	option start '100'
+	option limit '150'
+	option leasetime '12h'
+	option dhcpv6 'relay'
+	option ra 'relay'
+	option ndp 'hybrid'
+    option support_slip '1'
+```
 
 #### Ping test
 

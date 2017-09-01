@@ -1,6 +1,15 @@
 # Release Notes
 
-## mbedap-v3.0.0 - xx July 2017
+## mbedap-v4.0.0 - xx Sept 2017
+
+This release adds support for two new hardware platforms. Also, the random routing issue has been fixed.
+Following hardwares are supported:
+
+* Raspberry Pi 2B
+* Raspberry Pi 3
+* GL-AR150
+
+## mbedap-v3.0.0 - 26 July 2017
 
 This release merges the previous releases to support the Thread and the 6LoWPAN networks. In addition, this release adds mDNS and DNS-SD support to Nanostack to enable the Thread commissioning using the Thread mobile commissioner. Also, this release introduces the Neighbor Discovery Proxy (NDP) support for SLIP interface. This enables the creation of the Thread network even when only the `/64` prefix is available on the WAN side.
 
