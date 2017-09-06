@@ -1,6 +1,6 @@
 # Release Notes
 
-## mbedap-v4.0.0 - xx Sept 2017
+## mbedap-v4.0.0 - 06 Sept 2017
 
 This release adds support for two new hardware platforms. Also, the random routing issue has been fixed.
 Following hardwares are supported:

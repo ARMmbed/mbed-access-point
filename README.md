@@ -55,8 +55,8 @@ The current version of mbed Access Point requires IPv6 support in the backbone n
 
 To use the prebuilt image:
 
-1. Download the mbed Access Point [image](binaries/openwrt-mbedap-v3.0.0-3-gccf7c85a88-brcm2708-bcm2709-rpi-2-ext4-sdcard.img.gz) for Raspberry Pi 2B.
-1. Download the mbed Access Point [image](binaries/openwrt-mbedap-v3.0.0-3-gccf7c85a88-brcm2708-bcm2710-rpi-3-ext4-sdcard.img.gz) for Raspberry Pi 3.
+1. Download the mbed Access Point [image](binaries/openwrt-mbedap-v4.0.0-brcm2708-bcm2709-rpi-2-ext4-sdcard.img.gz) for Raspberry Pi 2B.
+1. Download the mbed Access Point [image](binaries/openwrt-mbedap-v4.0.0-brcm2708-bcm2710-rpi-3-ext4-sdcard.img.gz) for Raspberry Pi 3.
 2. Install the image on a micro-SD card. This [link](https://www.raspberrypi.org/documentation/installation/installing-images/) provides step by step instructions.
 3. Insert the micro-SD card into the Raspberry Pi's micro-SD card slot.
 
@@ -334,6 +334,26 @@ ping6 fd00:db80::d0c9:a7ad:6815:cf0f     // Pinging radio interface
 ### Backbone network with IPv6 and DHCP-PD support
 
 The mbed access point includes `odhcp6c` module, which is a minimal DHCPv6 and RA-client. `odhcp6c` supports RA + stateful DHCPv6 (IA_NA or IA_PD or both). If the backbone supports IPv6 and DHCP-PD, then `odhcp6c` requests a global prefix from the backbone router and configures the Thread network according to the prefix received.
+
+The default configuration of mbed access point assumes that the backbone network doesn't support DHCP-PD. If your backbone network supports it then `odhcpd` configuration needs to be updated in `/etc/config/dhcp`.
+
+Remove the section,
+```
+config dhcp 'wan6'
+	option master '1'
+	option ra 'relay'
+	option ndp 'relay'
+```
+Change `dhcpv6` and `ra` options to `server` and remove the option `option ndp 'hybrid'`,
+```
+config dhcp 'lan'
+	option interface 'lan'
+	option start '100'
+	option limit '150'
+	option leasetime '12h'
+	option dhcpv6 'server'
+	option ra 'server'
+```
 
 ### Backbone network with IPv6 and without DHCP-PD support
 The mbed access point uses Neighbour Discovery Proxy (NDP) if the backbone network doesn't support DHCP-PD. The NDP enables seamless communication between backbone and low power wireless network even when only /64 prefix is available on the WAN interface. The boolean config option "support_slip" needs to be added to `/etc/config/dhcp` to enable NDP support for SLIP interface.
