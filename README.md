@@ -55,8 +55,8 @@ The current version of mbed Access Point requires IPv6 support in the backbone n
 
 To use the prebuilt image:
 
-1. Download the mbed Access Point [image](binaries/openwrt-mbedap-v4.0.0-brcm2708-bcm2709-rpi-2-ext4-sdcard.img.gz) for Raspberry Pi 2B.
-1. Download the mbed Access Point [image](binaries/openwrt-mbedap-v4.0.0-brcm2708-bcm2710-rpi-3-ext4-sdcard.img.gz) for Raspberry Pi 3.
+1. Download the mbed Access Point [image](binaries/openwrt-mbedap-v4.0.1-brcm2708-bcm2709-rpi-2-ext4-sdcard.img.gz) for Raspberry Pi 2B.
+1. Download the mbed Access Point [image](binaries/openwrt-mbedap-v4.0.1-brcm2708-bcm2710-rpi-3-ext4-sdcard.img.gz) for Raspberry Pi 3.
 2. Install the image on a micro-SD card. This [link](https://www.raspberrypi.org/documentation/installation/installing-images/) provides step by step instructions.
 3. Insert the micro-SD card into the Raspberry Pi's micro-SD card slot.
 

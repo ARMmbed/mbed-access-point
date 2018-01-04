@@ -1,5 +1,9 @@
 # Release Notes
 
+## mbedap-v4.0.1 - 04 Jan 2018
+
+With this patch release, we are swithcing to public version of OpenWrt LuCI instead of private version of LuCI.
+
 ## mbedap-v4.0.0 - 06 Sept 2017
 
 This release adds support for two new hardware platforms. Also, the random routing issue has been fixed.
